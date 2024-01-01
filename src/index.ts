@@ -1,5 +1,4 @@
-import { Plugin, showMessage, IModel, openWindow, openTab } from "siyuan";
-import { SettingUtils } from "./libs/setting-utils";
+import { Plugin, showMessage, openTab, Protyle } from "siyuan";
 import { createApp } from "vue";
 import App from "./App.vue";
 import ElementPlus from "element-plus";
@@ -10,10 +9,6 @@ const TAB_TYPE = "custom_tab";
 const DOCK_TYPE = "dock_tab";
 
 export default class PluginTableView extends Plugin {
-  private customTab: () => IModel;
-  private isMobile: boolean;
-  private settingUtils: SettingUtils;
-
   async onload() {
     // 图标的制作参见帮助文档
     this.addIcons(`<symbol id="iconFace" viewBox="0 0 32 32">
@@ -42,9 +37,17 @@ export default class PluginTableView extends Plugin {
         rootEle.id = "app";
         tab.panelElement.appendChild(rootEle);
         const app = createApp(App);
-
         app.use(ElementPlus);
         app.mount("#app");
+
+        //todo 可行，但是如何在表格中实现
+        new Protyle(
+          this.app,
+          tab.panelElement.querySelector("#protyle") as HTMLElement,
+          {
+            blockId: "20230404125830-hdzwshd",
+          }
+        );
       },
     });
 

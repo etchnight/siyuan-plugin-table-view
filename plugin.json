@@ -1,6 +1,6 @@
 {
   "name": "siyuan-plugin-table-view",
-  "author": "frostime",
+  "author": "dualwind",
   "url": "https://github.com/etchnight/siyuan-plugin-table-view",
   "version": "0.0.1",
   "minAppVersion": "2.11.4",
@@ -13,9 +13,7 @@
   ],
   "frontends": [
     "desktop",
-    "mobile",
     "browser-desktop",
-    "browser-mobile",
     "desktop-window"
   ],
   "displayName": {
@@ -23,12 +21,12 @@
     "zh_CN": "表格预览"
   },
   "description": {
-    "en_US": "SiYuan plugin sample with vite and svelte",
-    "zh_CN": "使用 vite 和 svelte 开发的思源插件样例"
+    "en_US": "Use tags to generate a table of note content",
+    "zh_CN": "利用标签生成笔记内容表格"
   },
   "readme": {
-    "en_US": "README.md",
-    "zh_CN": "README_zh_CN.md"
+    "en_US": "README_en_US.md",
+    "zh_CN": "README.md"
   },
   "funding": {
     "custom": [

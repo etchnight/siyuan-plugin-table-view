@@ -19,11 +19,13 @@
       <Table :tag="selectedTag.value" :columnProps="columnProps" />
     </el-col>
   </el-row>
+  <el-row>
+    <el-col :span="24"> <div id="protyle"></div> </el-col>
+  </el-row>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-
 import SelectTag from "./components/SelectTag.vue";
 import Table from "./components/Table.vue";
 
