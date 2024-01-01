@@ -6,14 +6,18 @@
       :prop="child.value"
       :label="child.value.replace(tag + '/', '')"
       width="180"
-    />
+    >
+      <template #default="scope">
+        <protyle :id="scope.row[child.value]"></protyle
+      ></template>
+    </el-table-column>
   </el-table>
 </template>
 
 <script lang="ts" setup>
 import axios from "axios";
 import { ref, watch } from "vue";
-
+import protyle from "./protyle.vue";
 //import { Timer } from '@element-plus/icons-vue'
 
 const props = defineProps<{
@@ -29,7 +33,8 @@ interface Data {
 //let tableDate = [];
 const tableDataRef = ref([]);
 
-watch(props, async (newProps, oldProps) => {
+//?是否可以不用watch
+watch(props, async (newProps) => {
   let tag = newProps.tag;
   let columnProps = newProps.columnProps;
   const nameBlocks = await getNameBlocks(tag);
@@ -44,7 +49,7 @@ watch(props, async (newProps, oldProps) => {
         let propBlock = childBlocks.find((e) => {
           return e.markdown.indexOf(prop.value) > -1 && e.layer !== 0;
         });
-        data[prop.value] = propBlock.markdown;
+        data[prop.value] = propBlock.id;
       }
       return data;
     })

@@ -2,7 +2,8 @@ import { Plugin, showMessage, openTab, Protyle } from "siyuan";
 import { createApp } from "vue";
 import App from "./App.vue";
 import ElementPlus from "element-plus";
-import "element-plus/dist/index.css";
+//import "element-plus/dist/index.css";
+import "./index.css";
 
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
@@ -39,15 +40,32 @@ export default class PluginTableView extends Plugin {
         const app = createApp(App);
         app.use(ElementPlus);
         app.mount("#app");
-
+        /*
         //todo 可行，但是如何在表格中实现
-        new Protyle(
-          this.app,
+        let protyle = new Protyle(
+          window.siyuan.ws.app,
           tab.panelElement.querySelector("#protyle") as HTMLElement,
           {
             blockId: "20230404125830-hdzwshd",
+            mode: "wysiwyg",
+            render: {
+              title: false,
+              gutter: false,
+              breadcrumb: false,
+              breadcrumbDocName: false,
+            },
+            after: (protyle) => {//禁止编辑
+              let blockEles = protyle.protyle.contentElement?.querySelectorAll(
+                "[contenteditable='true']"
+              );
+              if (blockEles) {
+                for (let ele of blockEles) {
+                  ele.setAttribute("contenteditable", "false");
+                }
+              }
+            },
           }
-        );
+        );*/
       },
     });
 

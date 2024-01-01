@@ -10,9 +10,6 @@
         "
       />
     </el-col>
-    <el-col :span="6">
-      {{ selectedTag.value }}
-    </el-col>
   </el-row>
   <el-row>
     <el-col :span="24">

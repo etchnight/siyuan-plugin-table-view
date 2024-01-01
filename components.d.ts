@@ -12,6 +12,7 @@ declare module 'vue' {
     ElRow: typeof import('element-plus/es')['ElRow']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    Protyle: typeof import('./src/components/protyle.vue')['default']
     SelectTag: typeof import('./src/components/SelectTag.vue')['default']
     Table: typeof import('./src/components/Table.vue')['default']
   }
