@@ -1,0 +1,3 @@
+[submodule "lib/siyuanPlugin-common"]
+	path = lib/siyuanPlugin-common
+	url = https://github.com/etchnight/siyuanPlugin-common.git
