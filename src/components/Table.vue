@@ -19,7 +19,7 @@ import axios from "axios";
 import { ref, watch } from "vue";
 import protyle from "./protyle.vue";
 //import { Timer } from '@element-plus/icons-vue'
-
+import { BlockType } from "../../lib/siyuanPlugin-common/types/siyuan-api";
 const props = defineProps<{
   tag: string;
   columnProps: any[];
@@ -47,7 +47,11 @@ watch(props, async (newProps) => {
       for (let prop of columnProps) {
         //todo 处理列表情形
         let propBlock = childBlocks.find((e) => {
-          return e.markdown.indexOf(prop.value) > -1 && e.layer !== 0;
+          return (
+            e.markdown.indexOf(prop.value) > -1 &&
+            e.layer !== 0 &&
+            e.type != "l"
+          );
         });
         data[prop.value] = propBlock.id;
       }
@@ -125,17 +129,6 @@ type Block = {
   created: string;
   updated: string;
 };
-type BlockType =
-  | "d"
-  | "s"
-  | "h"
-  | "t"
-  | "i"
-  | "p"
-  | "f"
-  | "audio"
-  | "video"
-  | "other";
 
 type BlockSubType =
   | "d1"
