@@ -1,6 +1,6 @@
 import { Plugin, showMessage, openTab, Protyle, type IModel } from "siyuan";
-import { createApp } from "vue";
-import App from "./App.vue";
+import { createApp, type App } from "vue";
+import VueApp from "./VueApp.vue";
 import ElementPlus from "element-plus";
 //import "element-plus/dist/index.css";
 import "./index.css";
@@ -10,25 +10,30 @@ const TAB_TYPE = "custom_tab";
 const DOCK_TYPE = "dock_tab";
 
 export default class PluginTableView extends Plugin {
-  private customTab: () => IModel;
+  //private customTab: () => IModel;
   onload() {
     this.addIcons(`<symbol id="iconTableView" viewBox="0 0 32 32">
       <path style="stroke:none;fill-rule:nonzero;" d="M 29 1.4375 L 3 1.4375 C 1.34375 1.4375 0 2.78125 0 4.4375 L 0 26.4375 C 0 28.09375 1.34375 29.4375 3 29.4375 L 29 29.4375 C 30.65625 29.4375 32 28.09375 32 26.4375 L 32 4.4375 C 32 2.78125 30.65625 1.4375 29 1.4375 Z M 14 25.4375 L 4 25.4375 L 4 19.4375 L 14 19.4375 Z M 14 15.4375 L 4 15.4375 L 4 9.4375 L 14 9.4375 Z M 28 25.4375 L 18 25.4375 L 18 19.4375 L 28 19.4375 Z M 28 15.4375 L 18 15.4375 L 18 9.4375 L 28 9.4375 Z M 28 15.4375 "/>
-       </symbol>`);//fill:rgb(60%,60%,60%);fill-opacity:1;
-    const vueApp = createApp(App);
-    vueApp.use(ElementPlus);
-    this.customTab = this.addTab({
+       </symbol>`); //fill:rgb(60%,60%,60%);fill-opacity:1;
+    let vueApp: App<Element>;
+    this.addTab({
       type: TAB_TYPE,
       init() {
         this.element.innerHTML = `<div id="plugin-table-view-app">/div>`;
+        vueApp = createApp(VueApp);
+        vueApp.use(ElementPlus);
         vueApp.mount("#plugin-table-view-app");
+        //console.log("init");
       },
       beforeDestroy() {
         vueApp.unmount();
-        console.log("before destroy tab:", TAB_TYPE);
+        //console.log("before destroy tab:", TAB_TYPE);
       },
       destroy() {
-        console.log("destroy tab:", TAB_TYPE);
+        //console.log("destroy tab:", TAB_TYPE);
+      },
+      update() {
+        console.log("update", TAB_TYPE);
       },
     });
     console.log(this.i18n.helloPlugin);
@@ -49,6 +54,7 @@ export default class PluginTableView extends Plugin {
             id: this.name + TAB_TYPE,
           },
         });
+        //vueApp.mount("#plugin-table-view-app");
         /*
         //todo 可行，但是如何在表格中实现
         let protyle = new Protyle(
