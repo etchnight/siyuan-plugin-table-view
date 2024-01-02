@@ -25,11 +25,10 @@ export default class PluginTableView extends Plugin {
       type: TAB_TYPE,
       init() {
         this.element.innerHTML = `<div class="plugin-table-view-app">/div>`;
-
         vueApp.mount(".plugin-table-view-app");
       },
       beforeDestroy() {
-        vueApp.unmount()
+        vueApp.unmount();
         console.log("before destroy tab:", TAB_TYPE);
       },
       destroy() {

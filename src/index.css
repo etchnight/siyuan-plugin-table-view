@@ -1,3 +1,12 @@
-.protyle {
+.plugin-table-view-app .protyle {
   background-color: var(--b3-theme-background);
+}
+.plugin-table-view-app .el-table__inner-wrapper {
+  background-color: var(--custom-block-table-background-color);
+}
+/*注意，需要覆盖根变量，即引用的变量所引用的变量？*/
+/*todo 尚未完成*/
+.plugin-table-view-app {
+  --el-bg-color: var(--b3-theme-background);
+  --el-text-color-regular: var(--b3-theme-on-background);
 }
