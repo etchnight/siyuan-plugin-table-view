@@ -52,7 +52,8 @@ watch(props, async (newProps) => {
   tableDataRef.value = await Promise.all(
     nameBlocks.map(async (block: Block) => {
       let data: Data = {
-        name: block.content,
+        //todo 简单去除方法，未考虑行内代码等包含标签关键字情况
+        name: block.content.replace("#" + tag + "#", ""),
       };
       const childBlocks = await getChildBlocks(block);
       for (let prop of columnProps) {
