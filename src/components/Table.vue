@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableDataRef" style="width: 100%">
+  <el-table v-loading="loading" :data="tableDataRef" style="width: 100%">
     <el-table-column prop="name" label="名称" />
     <el-table-column
       v-for="child in props.columnProps"
@@ -32,9 +32,11 @@ interface Data {
 
 //let tableDate = [];
 const tableDataRef = ref([]);
+const loading = ref(false);
 
 //?是否可以不用watch
 watch(props, async (newProps) => {
+  loading.value = true;
   let tag = newProps.tag;
   let columnProps = newProps.columnProps;
   const nameBlocks = await getNameBlocks(tag);
@@ -58,7 +60,7 @@ watch(props, async (newProps) => {
       return data;
     })
   );
-  console.log(tableDataRef);
+  loading.value = false;
 });
 
 const getChildBlocks = async (block: Block): Promise<Block[]> => {
