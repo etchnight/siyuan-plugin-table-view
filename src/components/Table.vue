@@ -1,11 +1,16 @@
 <template>
-  <el-table v-loading="loading" :data="tableDataRef" style="width: 100%">
-    <el-table-column prop="name" label="名称" />
+  <el-table
+    v-loading="loading"
+    :data="tableDataRef"
+    style="width: 100%"
+    border="true"
+  >
+    <el-table-column prop="name" label="名称" resizable="true" />
     <el-table-column
       v-for="child in props.columnProps"
       :prop="child.value"
       :label="child.value.replace(tag + '/', '')"
-      width="180"
+      resizable="true"
     >
       <template #default="scope">
         <protyle :id="scope.row[child.value]"></protyle
@@ -43,16 +48,14 @@ watch(props, async (newProps) => {
   tableDataRef.value = await Promise.all(
     nameBlocks.map(async (block: Block) => {
       let data: Data = {
-        name: block.markdown,
+        name: block.content,
       };
       const childBlocks = await getChildBlocks(block);
       for (let prop of columnProps) {
         //todo 处理列表情形
         let propBlock = childBlocks.find((e) => {
           return (
-            e.markdown.indexOf(prop.value) > -1 &&
-            e.layer !== 0 &&
-            e.type != "l"
+            e.content.indexOf(prop.value) > -1 && e.layer !== 0 && e.type != "l"
           );
         });
         data[prop.value] = propBlock.id;
