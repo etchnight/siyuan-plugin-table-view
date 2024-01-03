@@ -40,11 +40,15 @@ const tableDataRef = ref([]);
 const loading = ref(false);
 
 //?是否可以不用watch
+//主程序入口
 watch(props, async (newProps) => {
   loading.value = true;
   let tag = newProps.tag;
   let columnProps = newProps.columnProps;
   const nameBlocks = await getNameBlocks(tag);
+  /*构建表格主体
+  第一列为名称，值为tag所在block的content
+  其余列根据tag表示的属性，分别从后代block中查找*/
   tableDataRef.value = await Promise.all(
     nameBlocks.map(async (block: Block) => {
       let data: Data = {
@@ -52,18 +56,20 @@ watch(props, async (newProps) => {
       };
       const childBlocks = await getChildBlocks(block);
       for (let prop of columnProps) {
-        //todo 处理列表情形
         let propBlock = childBlocks.find((e) => {
           return (
             e.content.indexOf(prop.value) > -1 && e.layer !== 0 && e.type != "l"
           );
         });
-        data[prop.value] = propBlock.id;
+        if (propBlock) {
+          data[prop.value] = propBlock.id;
+        }
       }
       return data;
     })
   );
   loading.value = false;
+  console.log(tableDataRef.value);
 });
 
 const getChildBlocks = async (block: Block): Promise<Block[]> => {
