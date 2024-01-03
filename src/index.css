@@ -1,12 +1,31 @@
-.plugin-table-view-app .protyle {
+/*注意，需要覆盖根变量，即引用的变量所引用的变量？*/
+/*todo 基本完成：1.需要继续优化显示效果 2. css选择器不够精准*/
+
+/*编辑器*/
+#plugin-table-view-app .protyle {
   background-color: var(--b3-theme-background);
 }
-.plugin-table-view-app .el-table__inner-wrapper {
+
+#plugin-table-view-app .el-table__inner-wrapper {
   background-color: var(--custom-block-table-background-color);
 }
-/*注意，需要覆盖根变量，即引用的变量所引用的变量？*/
-/*todo 尚未完成*/
-.plugin-table-view-app {
+
+#plugin-table-view-app {
   --el-bg-color: var(--b3-theme-background);
+  --el-fill-color-blank: transparent;
   --el-text-color-regular: var(--b3-theme-on-background);
+  --el-text-color-secondary: var(--b3-theme-on-background);
+  --el-border-color-light: var(--custom-popover-menu-outline-color);
+}
+
+/*表格*/
+#plugin-table-view-app .el-table {
+  --el-table-row-hover-bg-color: var(--b3-list-hover);
+}
+
+/*自动完成提示框*/
+.el-autocomplete__popper {
+  --el-bg-color-overlay: var(--b3-menu-background);
+  --el-text-color-regular: var(--b3-theme-on-background);
+  --el-fill-color-light: var(--b3-list-hover); /*hover 背景色*/
 }
