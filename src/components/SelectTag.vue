@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import axios from "axios";
+import { searchTag } from "../../lib/siyuanPlugin-common/siyuan-api/search";
 
 const state = ref("");
 //let tags = [];
@@ -20,12 +20,9 @@ interface TagItem {
   value: string;
 }
 const loadAll = async () => {
-  const res = await axios.post("/api/search/searchTag", { k: "" });
-  if (res.statusText !== "OK") {
-    return [];
-  }
+  const res = await searchTag("");
   let tags = [];
-  for (let tag of res.data.data.tags) {
+  for (let tag of res.tags) {
     tags.push({
       value: tag,
     });
