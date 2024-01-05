@@ -44,9 +44,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       # 子模块
       - name: Update Submodule
         run: git submodule update --init --recursive
