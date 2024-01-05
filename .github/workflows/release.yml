@@ -48,8 +48,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
         # 子模块
       - name: Update Submodule
         run: git submodule update --init --recursive
