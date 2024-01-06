@@ -5,12 +5,19 @@
     style="width: 100%"
     border="true"
   >
-    <el-table-column prop="name" label="名称" resizable="true" />
+    <el-table-column
+      prop="name"
+      label="名称"
+      resizable="true"
+      fixed="left"
+      align="center"
+    />
     <el-table-column
       v-for="prop in props.columnProps"
       :prop="prop.value"
       :label="prop.value.replace(tag + '/', '')"
       resizable="true"
+      header-align="center"
     >
       <template #default="scope">
         <div v-if="scope.row[prop.value]">
