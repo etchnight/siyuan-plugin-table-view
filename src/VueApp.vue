@@ -1,6 +1,6 @@
 <template>
   <el-row>
-    <el-col :span="6">
+    <el-col :span="24">
       <SelectTag
         @tagSelected="
           (item, children) => {

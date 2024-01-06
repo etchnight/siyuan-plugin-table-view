@@ -2,7 +2,7 @@
   <div v-html="html"></div>
 </template>
 <script lang="ts" setup>
-import { onUnmounted, ref } from "Vue";
+import { onUnmounted, ref } from "vue";
 import { Protyle } from "siyuan";
 
 const props = defineProps<{
@@ -49,4 +49,3 @@ onUnmounted(() => {
   protyle.destroy();
 });
 </script>
-

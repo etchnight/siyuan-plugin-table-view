@@ -33,6 +33,7 @@
     "vite-plugin-zip-pack": "^1.0.5"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "@vitejs/plugin-vue": "^5.0.2",
     "@vue/tsconfig": "^0.5.1",
     "axios": "^1.6.3",
