@@ -12,7 +12,7 @@
       <el-icon class="is-loading" :style="{ visibility: loading }"
         ><Loading
       /></el-icon>
-      <el-button :icon="Delete" type="info" plain @click="clearInput" />
+      <el-button :icon="Delete" type="info" circle @click="clearInput" />
     </el-form-item>
   </el-form>
 </template>

@@ -7,27 +7,35 @@
   >
     <el-table-column prop="name" label="名称" resizable="true" />
     <el-table-column
-      v-for="child in props.columnProps"
-      :prop="child.value"
-      :label="child.value.replace(tag + '/', '')"
+      v-for="prop in props.columnProps"
+      :prop="prop.value"
+      :label="prop.value.replace(tag + '/', '')"
       resizable="true"
     >
       <template #default="scope">
-        <protyle :id="scope.row[child.value]"></protyle
-      ></template>
+        <div v-if="scope.row[prop.value]">
+          <el-link
+            type="info"
+            :href="`siyuan://blocks/` + scope.row[prop.value]"
+            :icon="Link"
+          />
+        </div>
+        <protyle :id="scope.row[prop.value]"></protyle>
+      </template>
     </el-table-column>
   </el-table>
 </template>
-
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import protyle from "./protyle.vue";
+import { Link } from "@element-plus/icons-vue";
 import {
   queryBlocksByTag,
   queryDescendantBlocks,
 } from "../../lib/siyuanPlugin-common/siyuan-api/query";
 import { Block } from "../../lib/siyuanPlugin-common/types/siyuan-api";
 //import { Timer } from '@element-plus/icons-vue'
+
 const props = defineProps<{
   tag: string;
   columnProps: any[];
@@ -35,7 +43,7 @@ const props = defineProps<{
 
 interface Data {
   name: string;
-  [prop: string]: string;
+  [prop: string]: string; //prop表示标签名，值为id
 }
 
 //let tableDate = [];
