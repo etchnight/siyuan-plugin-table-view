@@ -4,14 +4,12 @@
       <el-autocomplete
         v-model="state"
         :fetch-suggestions="querySearchAsync"
-        placeholder="输入标签"
+        :placeholder="placeholderText"
         @select="handleSelect"
         :disabled="disableInput"
       >
       </el-autocomplete>
-      <el-icon class="is-loading" :style="{ visibility: loading }"
-        ><Loading
-      /></el-icon>
+      <el-icon class="is-loading" v-if="loading"><Loading /></el-icon>
       <el-button :icon="Delete" type="info" circle @click="clearInput" />
     </el-form-item>
   </el-form>
@@ -24,10 +22,11 @@ import { Delete, Loading } from "@element-plus/icons-vue";
 
 const state = ref("");
 const disableInput = ref(false);
-const loading = ref("visible");
+const loading = ref(true);
 //let tags = [];
 const tagsRef = ref([]);
 const emit = defineEmits(["tagSelected"]);
+const placeholderText = ref("正在加载标签");
 
 interface TagItem {
   value: string;
@@ -35,16 +34,6 @@ interface TagItem {
 const clearInput = () => {
   state.value = "";
   disableInput.value = false;
-};
-const loadAll = async () => {
-  const res = await searchTag("");
-  let tags = [];
-  for (let tag of res.tags) {
-    tags.push({
-      value: tag,
-    });
-  }
-  return tags;
 };
 
 //let timeout: ReturnType<typeof setTimeout>;
@@ -68,10 +57,23 @@ const handleSelect = (item: Record<string, any>) => {
   emit("tagSelected", item, children);
 };
 
-onMounted(async () => {
+const loadAll = async () => {
+  placeholderText.value = "正在加载标签";
   disableInput.value = true;
-  tagsRef.value = await loadAll();
-  loading.value = "hidden";
+  const res = await searchTag("");
+  let tags = [];
+  for (let tag of res.tags) {
+    tags.push({
+      value: tag,
+    });
+  }
+  loading.value = false;
   disableInput.value = false;
+  placeholderText.value = "请输入标签";
+  return tags;
+};
+
+onMounted(async () => {
+  tagsRef.value = await loadAll();
 });
 </script>
