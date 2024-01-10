@@ -11,6 +11,7 @@ import {
   queryBlocksByTag,
   queryDescendantBlocks,
 } from "../../lib/siyuanPlugin-common/siyuan-api/query";
+//import { getParentNextChildID } from "../../lib/siyuanPlugin-common/siyuan-api/block";
 import { Block } from "../../lib/siyuanPlugin-common/types/siyuan-api";
 import { Data, Head } from "./Table.vue";
 import Table from "./Table.vue";
@@ -65,7 +66,6 @@ watch(props, async (newProps) => {
   };
   recurList2Tree(tagTree, columnProps);
   tableHead.value = tagTree;
-  console.log(tagTree);
   /*构建表格主体
   第一列为名称，值为tag所在block的content
   其余列根据tag表示的属性，分别从后代block中查找*/
@@ -77,16 +77,36 @@ watch(props, async (newProps) => {
         name: block.content.replace("#" + tag + "#", ""),
       };
       const childBlocks = await queryDescendantBlocks(block);
+      const childBlocksReverse = childBlocks.toReversed();
       for (let prop of columnProps) {
-        let propBlock = childBlocks.find((e) => {
-          return (
-            e.content.indexOf(prop.value) > -1 && e.layer !== 0 && e.type != "l"
-          );
+        /*查找到的block需满足以下条件
+       - 如果不是段落，直接满足
+       - 如果是段落，则必须是父级的第一个子块，并且父级content是含有标签的块
+       */
+        let propBlock = childBlocksReverse.find((e) => {
+          return e.content.indexOf(prop.value) > -1;
         });
-        if (propBlock) {
-          data[prop.value] = propBlock.id;
+        if (!propBlock) {
+          continue;
         }
+        if (propBlock.type == "p") {
+          let parentBlock = childBlocksReverse.find((e) => {
+            return e.id == propBlock.parent_id;
+          });
+
+          //let firstChildId = await getParentNextChildID(propBlock.id);
+          //console.log(parentBlock.type, firstChildId, propBlock.id);
+          if (
+            parentBlock.content.indexOf(prop.value) > -1
+            //&& firstChildId.id == propBlock.id
+          ) {
+            propBlock = parentBlock;
+          }
+        }
+
+        data[prop.value] = propBlock.id;
       }
+
       return data;
     })
   );

@@ -13,8 +13,8 @@
           :href="`siyuan://blocks/` + scope.row[props.child.value]"
           :icon="Link"
         />
+        <protyle :id="scope.row[props.child.value]"></protyle>
       </div>
-      <protyle :id="scope.row[props.child.value]"></protyle>
     </template>
   </el-table-column>
   <el-table-column
@@ -34,11 +34,8 @@
 import protyle from "./protyle.vue";
 import { Link } from "@element-plus/icons-vue";
 import { Head } from "./Table.vue";
-import { onMounted } from "vue";
 const props = defineProps<{
   child: Head;
 }>();
-onMounted(() => {
-  console.log(props.child);
-});
+
 </script>
