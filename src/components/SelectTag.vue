@@ -25,10 +25,13 @@ const disableInput = ref(false);
 const loading = ref(true);
 //let tags = [];
 const tagsRef = ref([]);
-const emit = defineEmits(["tagSelected"]);
+//const emit = defineEmits(["tagSelected"]);
+const emit = defineEmits<{
+  tagSelected: [tag: TagItem, children: TagItem[]]; // 具名元组语法
+}>();
 const placeholderText = ref("正在加载标签");
 
-interface TagItem {
+export interface TagItem {
   value: string;
 }
 const clearInput = () => {
@@ -49,7 +52,7 @@ const createFilter = (queryString: string) => {
   };
 };
 
-const handleSelect = (item: Record<string, any>) => {
+const handleSelect = (item: TagItem) => {
   disableInput.value = true;
   let children = tagsRef.value.filter((tag) => {
     return tag.value.indexOf(item.value) === 0 && tag.value !== item.value;
@@ -57,7 +60,8 @@ const handleSelect = (item: Record<string, any>) => {
   emit("tagSelected", item, children);
 };
 
-const loadAll = async () => {
+//加载标签
+onMounted(async () => {
   placeholderText.value = "正在加载标签";
   disableInput.value = true;
   const res = await searchTag("");
@@ -70,10 +74,6 @@ const loadAll = async () => {
   loading.value = false;
   disableInput.value = false;
   placeholderText.value = "请输入标签";
-  return tags;
-};
-
-onMounted(async () => {
-  tagsRef.value = await loadAll();
+  tagsRef.value = tags;
 });
 </script>

@@ -20,6 +20,7 @@ declare module 'vue' {
     Protyle: typeof import('./src/components/protyle.vue')['default']
     SelectTag: typeof import('./src/components/SelectTag.vue')['default']
     Table: typeof import('./src/components/Table.vue')['default']
+    TableData_Tag: typeof import('./src/components/TableData_Tag.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

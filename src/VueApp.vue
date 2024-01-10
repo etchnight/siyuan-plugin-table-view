@@ -3,9 +3,9 @@
     <el-col :span="24">
       <SelectTag
         @tagSelected="
-          (item, children) => {
-            selectedTag = item;
-            columnProps = children;
+          (tag, tagChildren) => {
+            selectedTag = tag;
+            selectedTagChildren = tagChildren;
           }
         "
       />
@@ -13,7 +13,10 @@
   </el-row>
   <el-row>
     <el-col :span="24">
-      <Table :tag="selectedTag.value" :columnProps="columnProps" />
+      <TableData_Tag
+        :tag="selectedTag.value"
+        :tagChildren="selectedTagChildren"
+      />
     </el-col>
   </el-row>
   <el-row>
@@ -24,10 +27,10 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import SelectTag from "./components/SelectTag.vue";
-import Table from "./components/Table.vue";
+import TableData_Tag from "./components/TableData_Tag.vue";
 
 const selectedTag = ref({ value: "没有标签" });
-const columnProps = ref([]);
+const selectedTagChildren = ref([]);
 </script>
 <style>
 .el-row {
