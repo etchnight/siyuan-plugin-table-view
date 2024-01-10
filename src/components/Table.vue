@@ -12,30 +12,12 @@
       fixed="left"
       align="center"
     />
-    <el-table-column
-      v-for="prop in props.columnProps"
-      :prop="prop.value"
-      :label="prop.label"
-      resizable="true"
-      header-align="center"
-    >
-      <template #default="scope">
-        <div v-if="scope.row[prop.value]">
-          <el-link
-            type="info"
-            :href="`siyuan://blocks/` + scope.row[prop.value]"
-            :icon="Link"
-          />
-        </div>
-        <protyle :id="scope.row[prop.value]"></protyle>
-      </template>
-    </el-table-column>
+    <TableColumn v-for="prop in props.columnProps" :child="prop">
+    </TableColumn>
   </el-table>
 </template>
 <script lang="ts" setup>
-import protyle from "./protyle.vue";
-import { Link } from "@element-plus/icons-vue";
-
+import TableColumn from "./TableColumn.vue"
 const props = defineProps<{
   tableData: Data[];
   columnProps: Head[];

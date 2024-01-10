@@ -34,17 +34,16 @@ const recurList2Tree = (parent: Head, list: { value: string }[]) => {
   const parentLevel = parent.value.split("/").length;
   for (let item of list) {
     let itemPath = item.value.split("/");
-    if (itemPath.length <= parentLevel) {
-      continue;
+    if (
+      itemPath.length == parentLevel + 1 &&
+      item.value.indexOf(parent.value) == 0
+    ) {
+      children.push({
+        value: item.value,
+        label: itemPath[itemPath.length - 1],
+        children: [],
+      });
     }
-    if (item.value.indexOf(parent.value) !== 0) {
-      continue;
-    }
-    children.push({
-      value: item.value,
-      label: itemPath[itemPath.length - 1],
-      children: [],
-    });
   }
   parent.children = children;
   for (let child of parent.children) {
@@ -66,6 +65,7 @@ watch(props, async (newProps) => {
   };
   recurList2Tree(tagTree, columnProps);
   tableHead.value = tagTree;
+  console.log(tagTree);
   /*构建表格主体
   第一列为名称，值为tag所在block的content
   其余列根据tag表示的属性，分别从后代block中查找*/

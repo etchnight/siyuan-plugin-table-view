@@ -22,6 +22,10 @@
 #plugin-table-view-app .el-table {
   --el-table-row-hover-bg-color: var(--b3-list-hover);
 }
+/*表格-表头*/
+#plugin-table-view-app .el-table thead.is-group th.el-table__cell {
+  background-color: var(--b3-theme-background);
+}
 
 /*自动完成提示框*/
 .el-autocomplete__popper {
