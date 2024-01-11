@@ -77,34 +77,23 @@ watch(props, async (newProps) => {
         name: block.content.replace("#" + tag + "#", ""),
       };
       const childBlocks = await queryDescendantBlocks(block);
-      const childBlocksReverse = childBlocks.toReversed();
+      //const childBlocksReverse = childBlocks.toReversed();
       for (let prop of columnProps) {
         /*查找到的block需满足以下条件
        - 如果不是段落，直接满足
        - 如果是段落，则必须是父级的第一个子块，并且父级content是含有标签的块
        */
-        let propBlock = childBlocksReverse.find((e) => {
-          return e.content.indexOf(prop.value) > -1;
+        let propBlock = childBlocks.find((e) => {
+          return e.fcontent.indexOf(prop.value) > -1 && e.type !== "l";
         });
         if (!propBlock) {
-          continue;
-        }
-        if (propBlock.type == "p") {
-          let parentBlock = childBlocksReverse.find((e) => {
-            return e.id == propBlock.parent_id;
+          propBlock = childBlocks.find((e) => {
+            return e.content.indexOf(prop.value) > -1 && e.type == "p";
           });
-
-          //let firstChildId = await getParentNextChildID(propBlock.id);
-          //console.log(parentBlock.type, firstChildId, propBlock.id);
-          if (
-            parentBlock.content.indexOf(prop.value) > -1
-            //&& firstChildId.id == propBlock.id
-          ) {
-            propBlock = parentBlock;
-          }
         }
-
-        data[prop.value] = propBlock.id;
+        if (propBlock) {
+          data[prop.value] = propBlock.id;
+        }
       }
 
       return data;
