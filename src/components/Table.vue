@@ -12,12 +12,11 @@
       fixed="left"
       align="center"
     />
-    <TableColumn v-for="prop in props.columnProps" :child="prop">
-    </TableColumn>
+    <TableColumn v-for="prop in props.columnProps" :child="prop"> </TableColumn>
   </el-table>
 </template>
 <script lang="ts" setup>
-import TableColumn from "./TableColumn.vue"
+import TableColumn from "./TableColumn.vue";
 const props = defineProps<{
   tableData: Data[];
   columnProps: Head[];
@@ -34,5 +33,6 @@ export interface Head {
   value: string;
   label: string;
   children: Head[];
+  path: string[];
 }
 </script>

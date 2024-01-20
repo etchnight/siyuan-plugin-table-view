@@ -2,37 +2,24 @@
   "name": "siyuan-plugin-table-view",
   "author": "dualwind",
   "url": "https://github.com/etchnight/siyuan-plugin-table-view",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "minAppVersion": "2.11.4",
-  "backends": [
-    "windows",
-    "linux",
-    "darwin",
-    "ios",
-    "android"
-  ],
-  "frontends": [
-    "desktop",
-    "browser-desktop",
-    "desktop-window"
-  ],
+  "backends": ["windows", "linux", "darwin", "ios", "android"],
+  "frontends": ["desktop", "browser-desktop", "desktop-window"],
   "displayName": {
     "en_US": "Table View",
     "zh_CN": "表格预览"
   },
   "description": {
-    "en_US": "Use tags to generate a table of note content",
-    "zh_CN": "利用标签生成笔记内容表格"
+    "en_US": "Extract the content of the notes to generate a table that summarizes concepts and their attributes",
+    "zh_CN": "抽取笔记内容生成表格，汇总概念及其属性"
   },
   "readme": {
     "en_US": "README_en_US.md",
     "zh_CN": "README.md"
   },
   "funding": {
-    "custom": [
-    ]
+    "custom": []
   },
-  "keywords": [
-    "plugin", "sample", "插件样例"
-  ]
+  "keywords": ["plugin", "sample", "插件样例"]
 }
