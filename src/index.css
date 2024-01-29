@@ -1,6 +1,14 @@
 /*注意，需要覆盖根变量，即引用的变量所引用的变量？*/
 /*todo 基本完成：1.需要继续优化显示效果 2. css选择器不够精准*/
-
+/*全局颜色*/
+#plugin-table-view-app {
+  --el-fill-color-light: var(--b3-theme-background);
+  --el-text-color-primary: var(--b3-theme-on-background);
+  --el-text-color-regular: var(--b3-theme-on-background);
+  --el-text-color-secondary: var(--b3-theme-on-background);
+  --el-text-color-placeholder: var(--b3-theme-on-background);
+  --el-border-color-light: var(--custom-popover-menu-outline-color);
+}
 /*编辑器*/
 #plugin-table-view-app .protyle {
   background-color: var(--b3-theme-background);
@@ -13,9 +21,6 @@
 #plugin-table-view-app {
   --el-bg-color: var(--b3-theme-background);
   --el-fill-color-blank: transparent;
-  --el-text-color-regular: var(--b3-theme-on-background);
-  --el-text-color-secondary: var(--b3-theme-on-background);
-  --el-border-color-light: var(--custom-popover-menu-outline-color);
 }
 
 /*表格*/

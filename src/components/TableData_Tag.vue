@@ -1,5 +1,5 @@
 <template>
-  <el-button type="primary" @click="submit">生成</el-button>
+  <!--<el-button type="primary" @click="submit">生成</el-button>-->
   <Table
     :loading="loading"
     :tableData="tableDataRef"
@@ -73,7 +73,6 @@ const buildHead = (props: TagSelectedItem[]) => {
     recurList2Tree(tableHeadRef.value, item.children);
   }
 };
-//?是否可以不用watch
 //主程序入口
 const submit = async () => {
   //console.log(props.tags);
@@ -148,4 +147,7 @@ const submit = async () => {
   //console.log(tableDataRef.value);
   loading.value = false;
 };
+defineExpose({
+  submit,
+});
 </script>
