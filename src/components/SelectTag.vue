@@ -2,7 +2,7 @@
   <el-autocomplete
     v-model="state"
     :fetch-suggestions="querySearchAsync"
-    :placeholder="'输入以查询，选择标签以确认'"
+    :placeholder="'输入查询，选择确认'"
     @select="handleSelect"
     :disabled="model.tag.value !== ''"
   >

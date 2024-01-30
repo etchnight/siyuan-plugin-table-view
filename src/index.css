@@ -38,3 +38,7 @@
   --el-text-color-regular: var(--b3-theme-on-background);
   --el-fill-color-light: var(--b3-list-hover); /*hover 背景色*/
 }
+
+.block-autocomplete {
+  width: 300px; /**todo 计算方式 */
+}
