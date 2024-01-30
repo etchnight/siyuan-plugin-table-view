@@ -1,30 +1,27 @@
 <template>
   <el-autocomplete
-    v-model="model.tag.value"
+    v-model="state"
     :fetch-suggestions="querySearchAsync"
-    :placeholder="placeholderText"
+    :placeholder="'输入以查询，选择标签以确认'"
     @select="handleSelect"
-    :disabled="model.tag.value !== '' || loading"
+    :disabled="model.tag.value !== ''"
   >
   </el-autocomplete>
-  <el-icon class="is-loading" v-if="loading"><Loading /></el-icon>
+  <!--<el-icon class="is-loading" v-if="loading"><Loading /></el-icon>-->
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { searchTag } from "../../lib/siyuanPlugin-common/siyuan-api/search";
-import { Loading } from "@element-plus/icons-vue";
+//import { Loading } from "@element-plus/icons-vue";
 
+const state = ref("");
 const model = defineModel<{
   tag: TagItem;
   children: TagItem[];
 }>();
-const loading = ref(true);
-const tagsRef = ref([]);
-/*const emit = defineEmits<{
-  tagSelected: [tag: TagItem, children: TagItem[]]; // 具名元组语法
-}>();*/
-const placeholderText = ref("正在加载标签");
+//const tagsRef = ref([]);
+let tags: TagItem[] = [];
 
 export interface TagItem {
   value: string; //由于autocomplete组件的原因，返回值必须含有value字段
@@ -32,24 +29,24 @@ export interface TagItem {
 
 /**
  * @description 由于autocomplete组件的原因，返回值必须含有value字段
- * @param queryString
- * @param cb
  */
-const querySearchAsync = (queryString: string, cb: (arg: any) => void) => {
-  const results = queryString
-    ? tagsRef.value.filter(createFilter(queryString))
-    : tagsRef.value;
-  cb(results);
-};
-const createFilter = (queryString: string) => {
-  return (tag: TagItem) => {
-    return tag.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-  };
+const querySearchAsync = async (
+  queryString: string,
+  cb: (arg: any) => void
+) => {
+  tags = [];
+  const res = await searchTag(queryString);
+  for (let html of res.tags) {
+    tags.push({
+      value: html.replace(/<mark>(.*?)<\/mark>/g, "$1"),
+    });
+  }
+  cb(tags);
 };
 
 const handleSelect = (item: TagItem) => {
   //disableInput.value = true;
-  let children = tagsRef.value.filter((tag) => {
+  let children = tags.filter((tag) => {
     return tag.value.indexOf(item.value) === 0 && tag.value !== item.value;
   });
   //emit("tagSelected", item, children);
@@ -58,21 +55,4 @@ const handleSelect = (item: TagItem) => {
     children: children,
   };
 };
-//加载标签
-onMounted(async () => {
-  placeholderText.value = "正在加载标签";
-  loading.value = true;
-  let tags = [];
-  if (model.value.tag.value === "") {
-    const res = await searchTag("");
-    for (let tag of res.tags) {
-      tags.push({
-        value: tag,
-      });
-    }
-    tagsRef.value = tags;
-  }
-  loading.value = false;
-  placeholderText.value = "请输入标签";
-});
 </script>

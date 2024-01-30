@@ -10,7 +10,7 @@
   </el-steps>
   <!--step 0 查找概念-->
   <el-form v-if="!step">
-    <SelectTagFormItem v-model="tag_concept"></SelectTagFormItem>
+    <SelectTagFormItem v-model="tag_concept" :label="'含有右侧标签的块'" />
     <el-form-item label="右侧指定块">待办</el-form-item>
   </el-form>
   <!--step 1 查找属性-->
@@ -19,7 +19,7 @@
       <el-switch v-model="isContainsTagChild" />
     </el-form-item>
     <el-form-item>
-      <SelectTagFormItem v-model="tag_property"></SelectTagFormItem>
+      <SelectTagFormItem v-model="tag_property" :label="'含有右侧标签的块'" />
     </el-form-item>
     <el-form-item label="使用右侧分隔符号">
       <el-col :span="2">

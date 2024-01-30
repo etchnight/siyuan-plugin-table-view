@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    Concepts: typeof import('./src/components/Concepts.vue')['default']
     ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
@@ -23,6 +22,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     Protyle: typeof import('./src/components/protyle.vue')['default']
+    SelectBlock: typeof import('./src/components/SelectBlock.vue')['default']
     SelectTag: typeof import('./src/components/SelectTag.vue')['default']
     SelectTagFormItem: typeof import('./src/components/SelectTagFormItem.vue')['default']
     Table: typeof import('./src/components/Table.vue')['default']
