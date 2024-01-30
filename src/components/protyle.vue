@@ -10,7 +10,7 @@ const props = defineProps<{
 }>();
 const html = ref("");
 let protyle: Protyle;
-const buildHtml = (blockId) => {
+const buildHtml = (blockId: string) => {
   let tempDiv = document.createElement("div");
   protyle = new Protyle(window.siyuan.ws.app, tempDiv, {
     blockId: blockId,
@@ -38,7 +38,7 @@ const buildHtml = (blockId) => {
   });
 };
 
-function sleep(time) {
+function sleep(time: number) {
   return new Promise(function (resolve) {
     setTimeout(resolve, time);
   });

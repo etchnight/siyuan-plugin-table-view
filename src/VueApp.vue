@@ -8,36 +8,46 @@
     <el-step title="查找概念" />
     <el-step title="查找属性" />
   </el-steps>
-  <el-button style="margin-top: 12px" @click="previoStep">上一步</el-button>
-  <el-button style="margin-top: 12px" @click="nextStep">{{
-    nextText
-  }}</el-button>
-  <el-form :inline="true" v-if="!step">
-    <el-form-item v-for="(domain, index) in tagDomains">
-      <SelectTag v-model="tagDomains[index]" />
-      <el-button
-        :icon="Delete"
-        type="info"
-        circle
-        @click.prevent="removeTagDomain(index)"
-      />
+  <!--step 0 查找概念-->
+  <el-form v-if="!step">
+    <SelectTagFormItem v-model="tag_concept"></SelectTagFormItem>
+    <el-form-item label="右侧指定块">待办</el-form-item>
+  </el-form>
+  <!--step 1 查找属性-->
+  <el-form v-if="step">
+    <el-form-item label="上一步选定标签的子标签">
+      <el-switch v-model="isContainsTagChild" />
     </el-form-item>
     <el-form-item>
-      <el-button :icon="Plus" type="info" circle @click="addTagDomain" />
+      <SelectTagFormItem v-model="tag_property"></SelectTagFormItem>
+    </el-form-item>
+    <el-form-item label="使用右侧分隔符号">
+      <el-col :span="2">
+        <el-input v-model="splitFlag" />
+      </el-col>
     </el-form-item>
   </el-form>
+  <!--步骤按钮-->
+  <el-row>
+    <el-col :span="12">
+      <el-button style="margin-top: 12px" @click="previoStep">上一步</el-button>
+      <el-button style="margin-top: 12px" @click="nextStep">{{
+        nextText
+      }}</el-button>
+    </el-col>
+  </el-row>
+  <!--展示区域-->
   <el-row>
     <el-col :span="24">
-      <TableData_Tag :tags="tagDomains" ref="TableData_Tag_Ref" />
+      <TableData :tags="tag_concept" ref="TableData_Tag_Ref" />
     </el-col>
   </el-row>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { Delete, Plus } from "@element-plus/icons-vue";
-import SelectTag from "./components/SelectTag.vue";
-import TableData_Tag, { TagSelectedItem } from "./components/TableData_Tag.vue";
+import SelectTagFormItem from "./components/SelectTagFormItem.vue";
+import TableData, { TagSelectedItem } from "./components/TableData.vue";
 //*步骤条
 const step = ref(0);
 const nextText = ref("下一步");
@@ -47,7 +57,6 @@ const nextStep = () => {
     nextText.value = "生成";
   } else {
     submit();
-    console.log(tagDomains.value);
     step.value = 2;
   }
 };
@@ -57,32 +66,17 @@ const previoStep = () => {
     nextText.value = "下一步";
   }
 };
-const TableData_Tag_Ref = ref<InstanceType<typeof TableData_Tag>>();
+const TableData_Tag_Ref = ref<InstanceType<typeof TableData>>();
 const submit = () => {
-  console.log("ok", TableData_Tag_Ref.value);
   TableData_Tag_Ref.value?.submit();
 };
 
-const tagDomains = ref<TagSelectedItem[]>([
-  {
-    tag: {
-      value: "",
-    },
-    children: [],
-  },
-]);
-
-const addTagDomain = () => {
-  tagDomains.value.push({
-    tag: {
-      value: "",
-    },
-    children: [],
-  });
-};
-const removeTagDomain = (index: number) => {
-  tagDomains.value.splice(index, 1);
-};
+//*step 0 查找概念
+const tag_concept = ref<TagSelectedItem[]>([]);
+//*step 1 查找属性
+const tag_property = ref<TagSelectedItem[]>([]);
+const isContainsTagChild = ref(true);
+const splitFlag = ref("：");
 </script>
 <style>
 .el-row {
