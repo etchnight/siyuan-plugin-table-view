@@ -2,7 +2,6 @@
   <el-table
     v-loading="loading"
     :data="tableData"
-    style="width: 100%"
     border="true"
   >
     <el-table-column
@@ -28,10 +27,9 @@ export interface Data {
   children?: Data[];
   [prop: string]: string | Data[]; //prop表示标签名，值为id
 }
-
 export interface Head {
-  value: string;
-  label: string;
+  value: string; //用来跟body部分进行匹配
+  label: string; //显示的名称
   children: Head[];
   path: string[];
 }

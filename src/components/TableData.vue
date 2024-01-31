@@ -9,6 +9,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import {
+  queryBlockById,
   queryBlocksByTag,
   queryDescendantBlocks,
 } from "../../lib/siyuanPlugin-common/siyuan-api/query";
@@ -16,15 +17,19 @@ import {
 import { Block } from "../../lib/siyuanPlugin-common/types/siyuan-api";
 import { Data, Head } from "./Table.vue";
 import Table from "./Table.vue";
-import { AutocompleteItem } from "./SelectTag.vue";
+import { BlockAC } from "./SelectBlock.vue";
+import { AutocompleteItem, TagSelectedItem } from "./SelectTag.vue";
 
-const props = defineProps<{ tags: TagSelectedItem[] }>();
-export interface TagSelectedItem {
-  tag: AutocompleteItem;
-  children: AutocompleteItem[];
-}
+const props = defineProps<{
+  tag_concept: TagSelectedItem[];
+  blocks: BlockAC[];
+  tag_property: TagSelectedItem[];
+  isContainsTagChild: boolean;
+  splitFlag: string;
+}>();
+
 //let tableDate = [];
-const tableDataRef = ref([]);
+const tableDataRef = ref<Data[]>([]);
 const loading = ref(false);
 const tableHeadRef = ref<Head>({
   value: "",
@@ -34,53 +39,115 @@ const tableHeadRef = ref<Head>({
 });
 
 const recurList2Tree = (parent: Head, list: { value: string }[]) => {
-  let children: Head[] = [];
   for (let item of list) {
     let itemPath = item.value.split("/");
+    if (!isChild(itemPath, parent.path)) {
+      continue;
+    }
+    if (
+      parent.children.find((e) => {
+        return e.value === item.value;
+      })
+    ) {
+      continue;
+    }
+    parent.children.push({
+      value: item.value,
+      label: itemPath[itemPath.length - 1],
+      children: [],
+      path: itemPath,
+    });
+  }
+  for (let child of parent.children) {
+    recurList2Tree(child, list);
+  }
+  function isChild(itemPath: string[], parentPath: string[]) {
     let isChild = true;
-    if (itemPath.length !== parent.path.length + 1) {
+    if (itemPath.length !== parentPath.length + 1) {
       isChild = false;
     } else {
-      for (let i = 0; i < parent.path.length; i++) {
-        if (itemPath[i] !== parent.path[i]) {
+      for (let i = 0; i < parentPath.length; i++) {
+        if (itemPath[i] !== parentPath[i]) {
           isChild = false;
           break;
         }
       }
     }
-
-    if (isChild) {
-      children.push({
-        value: item.value,
-        label: itemPath[itemPath.length - 1],
-        children: [],
-        path: itemPath,
-      });
-    }
-  }
-  parent.children = parent.children.concat(children);
-  for (let child of parent.children) {
-    recurList2Tree(child, list);
+    return isChild;
   }
 };
+/**
+ * @description 构建表头
+ * @returns columnProps="tableHeadRef.children"
+ */
 const buildHead = (props: TagSelectedItem[]) => {
-  /*构建表头*/
-  tableHeadRef.value.children = [];
-  tableHeadRef.value.label = "";
   for (const item of props) {
-    tableHeadRef.value.value = item.tag.value;
-    tableHeadRef.value.path = item.tag.value.split("/");
-    recurList2Tree(tableHeadRef.value, item.children);
+    let head: Head = {
+      children: [],
+      value: item.tag.value,
+      label: item.tag.value,
+      path: item.tag.value.split("/"),
+    };
+    recurList2Tree(head, item.children);
+    tableHeadRef.value.children.push(head);
   }
+};
+/**
+ * @param props.tag_concept
+ * @param props.blocks
+ */
+const getblocks = async () => {
+  const blocksGroup = await Promise.all([
+    await Promise.all(
+      props.tag_concept.map(async (item) => {
+        const tag = item.tag.value;
+        return await queryBlocksByTag(tag);
+      })
+    ),
+    await Promise.all(
+      props.blocks.map(async (item) => {
+        return await queryBlockById(item.id);
+      })
+    ),
+  ]);
+  return flatten(blocksGroup) as Block[];
+};
+function flatten(arr: any[]): any[] {
+  return arr.reduce((pre, cur) => {
+    return pre.concat(Array.isArray(cur) ? flatten(cur) : cur);
+  }, []);
+}
+
+const getDescendantBlocks = async (blocks: Block[]) => {
+  return await Promise.all(
+    blocks.map(async (block: Block) => {
+      const childBlocks = await queryDescendantBlocks(block);
+      return {
+        childBlocks: childBlocks,
+        nameBlock: block,
+      };
+    })
+  );
 };
 //主程序入口
 const submit = async () => {
-  //console.log(props.tags);
   loading.value = true;
+  //清空
+  tableHeadRef.value = {
+    value: "",
+    label: "",
+    children: [],
+    path: [],
+  };
+  tableDataRef.value = [];
+
+  console.log(props);
+  //构建表头
+  /*
   //去重
   let tags: string[] = [];
   let propDeduplication: TagSelectedItem[] = [];
-  for (let item of props.tags) {
+  for (let item of props.tag_concept) {
     if (item.tag.value === "") {
       continue;
     }
@@ -89,62 +156,52 @@ const submit = async () => {
     }
     tags.push(item.tag.value);
     propDeduplication.push(item);
+  }*/
+  let propList: AutocompleteItem[] = [];
+  if (props.isContainsTagChild) {
+    buildHead(props.tag_concept);
+    for (let tag of props.tag_concept) {
+      propList = propList.concat(tag.children);
+    }
   }
-  buildHead(propDeduplication);
-  //console.log(tableHeadRef.value);
+  buildHead(props.tag_property);
+  for (let tag of props.tag_property) {
+    propList.push(tag.tag);
+    propList = propList.concat(tag.children);
+  }
+  console.log("propList", propList);
   //构建表格主体
-  //查找后代块
-  const dataSourceGroup = await Promise.all(
-    propDeduplication.map(async (item) => {
-      const tag = item.tag.value;
-      const nameBlocks = await queryBlocksByTag(tag);
-      let children = await Promise.all(
-        nameBlocks.map(async (block: Block) => {
-          const childBlocks = await queryDescendantBlocks(block);
-          return {
-            tag: tag,
-            columnProps: item.children,
-            childBlocks: childBlocks,
-            nameBlock: block,
-          };
-        })
-      );
-      return children;
-    })
-  );
+  const nameBlocks = await getblocks();
+  const childBlocks = await getDescendantBlocks(nameBlocks);
   /*
   第一列为名称，值为tag所在block的content
   其余列根据tag表示的属性，分别从后代block中查找*/
-  tableDataRef.value = [];
-  for (const itemGroup of dataSourceGroup) {
-    for (const item of itemGroup) {
-      let data: Data = {
-        //todo 简单去除方法，未考虑行内代码等包含标签关键字情况
-        name: item.nameBlock.content.replace("#" + item.tag + "#", ""),
-      };
-      //const childBlocksReverse = childBlocks.toReversed();
-      for (let prop of item.columnProps) {
-        /*查找到的block需满足以下条件
-       - 如果不是段落，直接满足
-       - 如果是段落，则必须是父级的第一个子块，并且父级content是含有标签的块
+  for (const block of childBlocks) {
+    let data: Data = {
+      name: block.nameBlock.content,
+    };
+    for (let prop of propList) {
+      /*查找到的block需满足以下条件
+        - 自上向下查询，排除列表块
+        - 容器块优先：第一个子块包含属性标签
+        - 未找到符合条件容器块，使用段落块
        */
-        let propBlock = item.childBlocks.find((e) => {
-          return e.fcontent.indexOf(prop.value) > -1 && e.type !== "l";
+      let propBlock = block.childBlocks.find((e) => {
+        return e.fcontent.indexOf(prop.value) > -1 && e.type !== "l";
+      });
+      if (!propBlock) {
+        propBlock = block.childBlocks.find((e) => {
+          return e.content.indexOf(prop.value) > -1 && e.type == "p";
         });
-        if (!propBlock) {
-          propBlock = item.childBlocks.find((e) => {
-            return e.content.indexOf(prop.value) > -1 && e.type == "p";
-          });
-        }
-        if (propBlock) {
-          data[prop.value] = propBlock.id;
-        }
       }
-
-      tableDataRef.value.push(data);
+      if (propBlock) {
+        data[prop.value] = propBlock.id;
+      }
     }
+    tableDataRef.value.push(data);
   }
-  //console.log(tableDataRef.value);
+
+  console.log(tableDataRef.value);
   loading.value = false;
 };
 defineExpose({

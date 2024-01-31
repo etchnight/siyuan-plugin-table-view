@@ -19,8 +19,10 @@
 </template>
 <script setup lang="ts">
 import { Delete, Plus } from "@element-plus/icons-vue";
+import { BlockAC } from "./SelectBlock.vue";
+import { TagSelectedItem } from "./SelectTag.vue";
 
-const domains = defineModel<any[]>();
+const domains = defineModel<(BlockAC | TagSelectedItem)[]>();
 
 const addTagDomain = () => {
   domains.value.push(null);

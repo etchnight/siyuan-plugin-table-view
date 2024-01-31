@@ -13,7 +13,7 @@
     <el-form-item label="含有右侧标签的块">
       <SelectTagFormItem v-model="tag_concept" #default="{ item, index }">
         <selectTag
-          :item="item"
+          :item="(item as TagSelectedItem)"
           :index="index"
           @update="
             (item) => {
@@ -24,7 +24,10 @@
       </SelectTagFormItem>
     </el-form-item>
     <el-form-item label="右侧指定块">
-      <SelectTagFormItem v-model="blocks" #default="{ item, index }">
+      <SelectTagFormItem
+        v-model="(blocks as BlockAC[])"
+        #default="{ item, index }"
+      >
         <SelectBlock
           :item="item"
           :index="index"
@@ -42,10 +45,10 @@
     <el-form-item label="上一步选定标签的子标签">
       <el-switch v-model="isContainsTagChild" />
     </el-form-item>
-    <el-form-item label="含有右侧标签的块">
+    <el-form-item label="含有右侧标签及其子标签的块">
       <SelectTagFormItem v-model="tag_property" #default="{ item, index }">
         <selectTag
-          :item="item"
+          :item="(item as TagSelectedItem)"
           :index="index"
           @update="
             (item) => {
@@ -73,7 +76,14 @@
   <!--展示区域-->
   <el-row>
     <el-col :span="24">
-      <TableData :tags="tag_concept" ref="TableData_Tag_Ref" />
+      <TableData
+        ref="TableData_Tag_Ref"
+        :tag_concept="tag_concept"
+        :blocks="(blocks as BlockAC[])/** todo 提示类型不同，未知错误 */"
+        :tag_property="tag_property"
+        :isContainsTagChild="isContainsTagChild"
+        :splitFlag="splitFlag"
+      />
     </el-col>
   </el-row>
 </template>
@@ -81,9 +91,9 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import SelectTagFormItem from "./components/SelectTagFormItem.vue";
-import selectTag from "./components/SelectTag.vue";
+import selectTag, { TagSelectedItem } from "./components/SelectTag.vue";
 import SelectBlock, { BlockAC } from "./components/SelectBlock.vue";
-import TableData, { TagSelectedItem } from "./components/TableData.vue";
+import TableData from "./components/TableData.vue";
 //*步骤条
 const step = ref(0);
 const nextText = ref("下一步");
@@ -102,6 +112,8 @@ const previoStep = () => {
     nextText.value = "下一步";
   }
 };
+
+//*提交
 const TableData_Tag_Ref = ref<InstanceType<typeof TableData>>();
 const submit = () => {
   TableData_Tag_Ref.value?.submit();
