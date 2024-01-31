@@ -5,6 +5,8 @@
     :placeholder="'输入查询，选择确认'"
     @select="handleSelect"
     popper-class="protyle-hint b3-list b3-list--background block-autocomplete"
+    :disabled="selected"
+    value-key="contentCleared"
   >
     <template #default="{ item }">
       <SearchRefBlockItem :item="item" />
@@ -23,18 +25,19 @@ import {
   ESearchOrderBy,
   FullTextSearchBlockResult,
 } from "../../lib/siyuanPlugin-common/siyuan-api/search";
+import { AutocompleteItem } from "./SelectTag.vue";
 const state = ref("");
-const model = defineModel<{
-  block: BlockAC;
+const selected = ref(false);
+const emit = defineEmits<{
+  (e: "update", block: BlockAC): void;
 }>();
 //const tagsRef = ref([]);
 let blocks: BlockAC[] = [];
 
-export interface TagItem {
-  value: string; //由于autocomplete组件的原因，返回值必须含有value字段
-}
-export type BlockAC = FullTextSearchBlockResult & TagItem;
-model.value?.block?.hPath;
+export type BlockAC = FullTextSearchBlockResult &
+  AutocompleteItem & {
+    contentCleared: string;
+  };
 
 /**
  * @description 由于autocomplete组件的原因，返回值必须含有value字段
@@ -63,22 +66,22 @@ const querySearchAsync = async (
     ESearchMethod.keyword,
     types,
     [],
-    ESearchOrderBy.按相关度降序,
+    ESearchOrderBy.类型,
     ESearchGroupBy.不分组
   );
   for (let block of res.blocks) {
     blocks.push({
       ...block,
       value: block.id,
+      contentCleared: block.content.replace(/<mark>(.*?)<\/mark>/, "$1"),
     });
   }
   cb(blocks);
 };
 
 const handleSelect = (item: BlockAC) => {
-  model.value = {
-    block: item,
-  };
+  emit("update", item);
+  selected.value = true;
 };
 </script>
 

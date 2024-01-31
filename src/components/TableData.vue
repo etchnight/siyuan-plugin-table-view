@@ -16,12 +16,12 @@ import {
 import { Block } from "../../lib/siyuanPlugin-common/types/siyuan-api";
 import { Data, Head } from "./Table.vue";
 import Table from "./Table.vue";
-import { TagItem } from "./SelectTag.vue";
+import { AutocompleteItem } from "./SelectTag.vue";
 
 const props = defineProps<{ tags: TagSelectedItem[] }>();
 export interface TagSelectedItem {
-  tag: TagItem;
-  children: TagItem[];
+  tag: AutocompleteItem;
+  children: AutocompleteItem[];
 }
 //let tableDate = [];
 const tableDataRef = ref([]);

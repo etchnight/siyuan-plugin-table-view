@@ -4,7 +4,7 @@
     :fetch-suggestions="querySearchAsync"
     :placeholder="'输入查询，选择确认'"
     @select="handleSelect"
-    :disabled="model.tag.value !== ''"
+    :disabled="selected"
   >
   </el-autocomplete>
   <!--<el-icon class="is-loading" v-if="loading"><Loading /></el-icon>-->
@@ -16,20 +16,19 @@ import { searchTag } from "../../lib/siyuanPlugin-common/siyuan-api/search";
 //import { Loading } from "@element-plus/icons-vue";
 
 const state = ref("");
-const model = defineModel<{
-  tag: TagItem;
-  children: TagItem[];
+const selected = ref(false);
+const emit = defineEmits<{
+  (e: "update", item: { tag: AutocompleteItem; children: AutocompleteItem[] });
 }>();
 //const tagsRef = ref([]);
-let tags: TagItem[] = [];
-
-export interface TagItem {
-  value: string; //由于autocomplete组件的原因，返回值必须含有value字段
-}
-
+let tags: AutocompleteItem[] = [];
 /**
  * @description 由于autocomplete组件的原因，返回值必须含有value字段
  */
+export interface AutocompleteItem {
+  value: string; 
+}
+
 const querySearchAsync = async (
   queryString: string,
   cb: (arg: any) => void
@@ -44,15 +43,15 @@ const querySearchAsync = async (
   cb(tags);
 };
 
-const handleSelect = (item: TagItem) => {
+const handleSelect = (item: AutocompleteItem) => {
   //disableInput.value = true;
   let children = tags.filter((tag) => {
     return tag.value.indexOf(item.value) === 0 && tag.value !== item.value;
   });
-  //emit("tagSelected", item, children);
-  model.value = {
+  emit("update", {
     tag: item,
     children: children,
-  };
+  });
+  selected.value = true;
 };
 </script>

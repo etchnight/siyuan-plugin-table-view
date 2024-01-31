@@ -1,14 +1,16 @@
 <template>
+  <!--* 由于历史原因，该文件名未更改，因使用插槽，不限于tag输入框使用-->
   <el-form :inline="true">
-    <el-form-item :label="props.label"> </el-form-item>
-    <el-form-item v-for="(domain, index) in tagDomain">
-      <SelectTag v-model="tagDomain[index]" />
-      <el-button
-        :icon="Delete"
-        type="info"
-        circle
-        @click.prevent="removeTagDomain(index)"
-      />
+    <el-form-item>
+      <template v-for="(domain, index) in domains">
+        <slot :item="domain" :index="index"></slot>
+        <el-button
+          :icon="Delete"
+          type="info"
+          circle
+          @click.prevent="removeTagDomain(index)"
+        />
+      </template>
     </el-form-item>
     <el-form-item>
       <el-button :icon="Plus" type="info" circle @click="addTagDomain" />
@@ -17,22 +19,13 @@
 </template>
 <script setup lang="ts">
 import { Delete, Plus } from "@element-plus/icons-vue";
-import SelectTag from "./SelectTag.vue";
-import { TagSelectedItem } from "./TableData.vue";
-const props = defineProps<{
-  label: string;
-}>();
-const tagDomain = defineModel<TagSelectedItem[]>();
+
+const domains = defineModel<any[]>();
 
 const addTagDomain = () => {
-  tagDomain.value.push({
-    tag: {
-      value: "",
-    },
-    children: [],
-  });
+  domains.value.push(null);
 };
 const removeTagDomain = (index: number) => {
-  tagDomain.value.splice(index, 1);
+  domains.value.splice(index, 1);
 };
 </script>

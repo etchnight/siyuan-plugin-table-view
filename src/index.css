@@ -8,6 +8,8 @@
   --el-text-color-secondary: var(--b3-theme-on-background);
   --el-text-color-placeholder: var(--b3-theme-on-background);
   --el-border-color-light: var(--custom-popover-menu-outline-color);
+  --el-bg-color: var(--b3-theme-background);
+  --el-fill-color-blank: transparent;
 }
 /*编辑器*/
 #plugin-table-view-app .protyle {
@@ -16,11 +18,6 @@
 
 #plugin-table-view-app .el-table__inner-wrapper {
   background-color: var(--custom-block-table-background-color);
-}
-
-#plugin-table-view-app {
-  --el-bg-color: var(--b3-theme-background);
-  --el-fill-color-blank: transparent;
 }
 
 /*表格*/
@@ -39,6 +36,11 @@
   --el-fill-color-light: var(--b3-list-hover); /*hover 背景色*/
 }
 
+/*block自动完成 popper*/
 .block-autocomplete {
   width: 300px; /**todo 计算方式 */
+}
+
+#plugin-table-view-app .label_select {
+  width: 70px;
 }

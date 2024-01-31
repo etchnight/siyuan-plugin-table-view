@@ -9,19 +9,51 @@
     <el-step title="查找属性" />
   </el-steps>
   <!--step 0 查找概念-->
-  <el-form v-if="!step">
-    <SelectTagFormItem v-model="tag_concept" :label="'含有右侧标签的块'" />
+  <el-form v-if="!step" label-width="150px">
+    <el-form-item label="含有右侧标签的块">
+      <SelectTagFormItem v-model="tag_concept" #default="{ item, index }">
+        <selectTag
+          :item="item"
+          :index="index"
+          @update="
+            (item) => {
+              tag_concept[index] = item;
+            }
+          "
+        ></selectTag>
+      </SelectTagFormItem>
+    </el-form-item>
     <el-form-item label="右侧指定块">
-      <SelectBlock v-model="block" />
+      <SelectTagFormItem v-model="blocks" #default="{ item, index }">
+        <SelectBlock
+          :item="item"
+          :index="index"
+          @update="
+            (item) => {
+              blocks[index] = item;
+            }
+          "
+        ></SelectBlock>
+      </SelectTagFormItem>
     </el-form-item>
   </el-form>
   <!--step 1 查找属性-->
-  <el-form v-if="step">
+  <el-form v-if="step" label-width="200px">
     <el-form-item label="上一步选定标签的子标签">
       <el-switch v-model="isContainsTagChild" />
     </el-form-item>
-    <el-form-item>
-      <SelectTagFormItem v-model="tag_property" :label="'含有右侧标签的块'" />
+    <el-form-item label="含有右侧标签的块">
+      <SelectTagFormItem v-model="tag_property" #default="{ item, index }">
+        <selectTag
+          :item="item"
+          :index="index"
+          @update="
+            (item) => {
+              tag_property[index] = item;
+            }
+          "
+        ></selectTag>
+      </SelectTagFormItem>
     </el-form-item>
     <el-form-item label="使用右侧分隔符号">
       <el-col :span="2">
@@ -49,6 +81,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import SelectTagFormItem from "./components/SelectTagFormItem.vue";
+import selectTag from "./components/SelectTag.vue";
 import SelectBlock, { BlockAC } from "./components/SelectBlock.vue";
 import TableData, { TagSelectedItem } from "./components/TableData.vue";
 //*步骤条
@@ -76,7 +109,7 @@ const submit = () => {
 
 //*step 0 查找概念
 const tag_concept = ref<TagSelectedItem[]>([]);
-const block = ref<{ block: BlockAC }>();
+const blocks = ref<BlockAC[]>([]);
 //*step 1 查找属性
 const tag_property = ref<TagSelectedItem[]>([]);
 const isContainsTagChild = ref(true);
