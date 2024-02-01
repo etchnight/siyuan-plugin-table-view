@@ -125,7 +125,7 @@ const blocks = ref<BlockAC[]>([]);
 //*step 1 查找属性
 const tag_property = ref<TagSelectedItem[]>([]);
 const isContainsTagChild = ref(true);
-const splitFlag = ref("：");
+const splitFlag = ref("：：");
 </script>
 <style>
 .el-row {

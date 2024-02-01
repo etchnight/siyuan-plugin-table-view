@@ -96,7 +96,7 @@ const buildHead = (props: TagSelectedItem[]) => {
  * @param props.tag_concept
  * @param props.blocks
  */
-const getblocks = async () => {
+const getNameBlocks = async () => {
   const blocksGroup = await Promise.all([
     await Promise.all(
       props.tag_concept.map(async (item) => {
@@ -118,7 +118,15 @@ function flatten(arr: any[]): any[] {
   }, []);
 }
 
-const getDescendantBlocks = async (blocks: Block[]) => {
+type descendantBlockGroup = {
+  childBlocks: (Block & {
+    layer: number;
+  })[];
+  nameBlock: Block;
+};
+const getDescendantBlocks = async (
+  blocks: Block[]
+): Promise<descendantBlockGroup[]> => {
   return await Promise.all(
     blocks.map(async (block: Block) => {
       const childBlocks = await queryDescendantBlocks(block);
@@ -128,6 +136,87 @@ const getDescendantBlocks = async (blocks: Block[]) => {
       };
     })
   );
+};
+/**
+ * @description 查找到的block需满足以下条件
+        - 自上向下查询，排除列表块
+        - 容器块优先：第一个子块包含属性标签
+        - 未找到符合条件容器块，使用段落块
+ * @param block
+ * @param prop
+ */
+const getPropBlock = (block: descendantBlockGroup, prop: string) => {
+  /*
+   */
+  let propBlock = block.childBlocks.find((e) => {
+    return e.fcontent.indexOf(prop) > -1 && e.type !== "l";
+  });
+  if (!propBlock) {
+    propBlock = block.childBlocks.find((e) => {
+      return e.content.indexOf(prop) > -1 && e.type == "p";
+    });
+  }
+  return propBlock;
+};
+type DescendantBlockTree = {
+  nameBlock: Block;
+  children: DescendantBlockTree[];
+};
+const buildDescendantBlockTree = (
+  splitFlag: string,
+  blocks: (Block & {
+    layer: number;
+  })[],
+  parent: DescendantBlockTree
+) => {
+  //childBlocks
+  let childBlocks = blocks.filter((e) => {
+    return (
+      (e.fcontent.indexOf(splitFlag) > 0 ||
+        (e.content.indexOf(splitFlag) > 0 && e.type === "p")) &&
+      e.parent_id === parent.nameBlock.id &&
+      e.content !== parent.nameBlock.fcontent //排除第一个子块（其父级是属性块）,一个内容只算一次
+    );
+  });
+  parent.children = childBlocks.map((e) => {
+    return {
+      nameBlock: e,
+      children: [],
+    };
+  });
+  for (let block of parent.children) {
+    buildDescendantBlockTree(splitFlag, blocks, block);
+  }
+};
+/**
+ * @description 剔除列表块，将其子项全部挂到列表块的父级
+ * @param blocks
+ */
+const rebuildChildrenBlocks = (
+  blocks: (Block & {
+    layer: number;
+  })[]
+) => {
+  let newBlocks: (Block & {
+    layer: number;
+  })[] = [];
+  for (let block of blocks) {
+    if (block.type === "l") {
+      continue;
+    }
+    let parent = blocks.find((p) => {
+      return p.id === block.parent_id;
+    });
+    let blockClone = JSON.parse(JSON.stringify(block)) as Block & {
+      layer: number;
+    };
+
+    if (parent?.type === "l") {
+      blockClone.parent_id = parent.parent_id;
+    }
+    newBlocks.push(blockClone);
+  }
+  return newBlocks;
 };
 //主程序入口
 const submit = async () => {
@@ -140,23 +229,10 @@ const submit = async () => {
     path: [],
   };
   tableDataRef.value = [];
-
-  console.log(props);
-  //构建表头
-  /*
-  //去重
-  let tags: string[] = [];
-  let propDeduplication: TagSelectedItem[] = [];
-  for (let item of props.tag_concept) {
-    if (item.tag.value === "") {
-      continue;
-    }
-    if (tags.indexOf(item.tag.value) !== -1) {
-      continue;
-    }
-    tags.push(item.tag.value);
-    propDeduplication.push(item);
-  }*/
+  //构建行
+  const nameBlocks = await getNameBlocks();
+  const childBlocks = await getDescendantBlocks(nameBlocks);
+  //构建表头（列）
   let propList: AutocompleteItem[] = [];
   if (props.isContainsTagChild) {
     buildHead(props.tag_concept);
@@ -169,11 +245,7 @@ const submit = async () => {
     propList.push(tag.tag);
     propList = propList.concat(tag.children);
   }
-  console.log("propList", propList);
-  //构建表格主体
-  const nameBlocks = await getblocks();
-  const childBlocks = await getDescendantBlocks(nameBlocks);
-  /*
+  /*行列对应
   第一列为名称，值为tag所在block的content
   其余列根据tag表示的属性，分别从后代block中查找*/
   for (const block of childBlocks) {
@@ -181,27 +253,24 @@ const submit = async () => {
       name: block.nameBlock.content,
     };
     for (let prop of propList) {
-      /*查找到的block需满足以下条件
-        - 自上向下查询，排除列表块
-        - 容器块优先：第一个子块包含属性标签
-        - 未找到符合条件容器块，使用段落块
-       */
-      let propBlock = block.childBlocks.find((e) => {
-        return e.fcontent.indexOf(prop.value) > -1 && e.type !== "l";
-      });
-      if (!propBlock) {
-        propBlock = block.childBlocks.find((e) => {
-          return e.content.indexOf(prop.value) > -1 && e.type == "p";
-        });
-      }
+      let propBlock = getPropBlock(block, prop.value);
       if (propBlock) {
         data[prop.value] = propBlock.id;
       }
     }
     tableDataRef.value.push(data);
-  }
 
-  console.log(tableDataRef.value);
+    //*分隔符号属性
+    if (props.splitFlag) {
+      const childBlocks = rebuildChildrenBlocks(block.childBlocks);
+      let root = {
+        nameBlock: block.nameBlock,
+        children: [],
+      };
+      buildDescendantBlockTree(props.splitFlag, childBlocks, root);
+      console.log(root);
+    }
+  }
   loading.value = false;
 };
 defineExpose({
