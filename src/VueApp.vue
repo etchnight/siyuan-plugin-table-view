@@ -67,7 +67,9 @@
   <!--步骤按钮-->
   <el-row>
     <el-col :span="12">
-      <el-button style="margin-top: 12px" @click="previoStep">上一步</el-button>
+      <el-button style="margin-top: 12px" @click="previoStep" v-if="step">
+        上一步
+      </el-button>
       <el-button style="margin-top: 12px" @click="nextStep">{{
         nextText
       }}</el-button>

@@ -80,13 +80,14 @@ const recurList2Tree = (parent: Head, list: { value: string }[]) => {
  * @description 构建表头
  * @returns columnProps="tableHeadRef.children"
  */
-const buildHead = (props: TagSelectedItem[]) => {
+const buildHead = (props: TagSelectedItem[], splitFlag?: string) => {
+  splitFlag = splitFlag || "/";
   for (const item of props) {
     let head: Head = {
       children: [],
       value: item.tag.value,
       label: item.tag.value,
-      path: item.tag.value.split("/"),
+      path: item.tag.value.split(splitFlag),
     };
     recurList2Tree(head, item.children);
     tableHeadRef.value.children.push(head);
@@ -162,6 +163,9 @@ type DescendantBlockTree = {
   nameBlock: Block;
   children: DescendantBlockTree[];
 };
+/**
+ * @returns 改变parent: DescendantBlockTree
+ */
 const buildDescendantBlockTree = (
   splitFlag: string,
   blocks: (Block & {
@@ -218,7 +222,39 @@ const rebuildChildrenBlocks = (
   }
   return newBlocks;
 };
-//主程序入口
+
+/**
+ * @param parent Head类型
+ *  - 通过迭代更改
+ *  - 应将最终结果的children与tableHeadRef合并
+ *  - 根对象是虚拟的，对应的是概念块（而非属性块）
+ * @param props.splitFlag 隐含变量
+ * @param data blockTree.nameBlock所在行
+ */
+const blockTree2TableData = (
+  blockTree: DescendantBlockTree,
+  parent: Head,
+  data: Data
+) => {
+  for (let block of blockTree.children) {
+    const reg = new RegExp(`(${props.splitFlag}).*`);
+    let prop = block.nameBlock.content.replace(reg, "");
+    let propValue = parent.value + prop + props.splitFlag;
+    let child: Head = {
+      value: propValue,
+      label: prop,
+      path: parent.path.concat(prop),
+      children: [],
+    };
+    parent.children.push(child);
+    data[propValue] = block.nameBlock.id;
+    blockTree2TableData(block, child, data);
+  }
+};
+
+/**
+ * @description 主程序入口
+ */
 const submit = async () => {
   loading.value = true;
   //清空
@@ -229,9 +265,11 @@ const submit = async () => {
     path: [],
   };
   tableDataRef.value = [];
+
   //构建行
   const nameBlocks = await getNameBlocks();
-  const childBlocks = await getDescendantBlocks(nameBlocks);
+  const nameAndChildBlocks = await getDescendantBlocks(nameBlocks);
+
   //构建表头（列）
   let propList: AutocompleteItem[] = [];
   if (props.isContainsTagChild) {
@@ -245,32 +283,45 @@ const submit = async () => {
     propList.push(tag.tag);
     propList = propList.concat(tag.children);
   }
-  /*行列对应
+  /*构建主体，行列对应
   第一列为名称，值为tag所在block的content
   其余列根据tag表示的属性，分别从后代block中查找*/
-  for (const block of childBlocks) {
+  for (const nameBlockObj of nameAndChildBlocks) {
     let data: Data = {
-      name: block.nameBlock.content,
+      name: nameBlockObj.nameBlock.content,
     };
     for (let prop of propList) {
-      let propBlock = getPropBlock(block, prop.value);
+      let propBlock = getPropBlock(nameBlockObj, prop.value);
       if (propBlock) {
         data[prop.value] = propBlock.id;
       }
     }
-    tableDataRef.value.push(data);
+    //tableDataRef.value.push(data);
 
     //*分隔符号属性
     if (props.splitFlag) {
-      const childBlocks = rebuildChildrenBlocks(block.childBlocks);
-      let root = {
-        nameBlock: block.nameBlock,
+      const childBlocks = rebuildChildrenBlocks(nameBlockObj.childBlocks);
+      let blockRoot: DescendantBlockTree = {
+        nameBlock: nameBlockObj.nameBlock,
         children: [],
       };
-      buildDescendantBlockTree(props.splitFlag, childBlocks, root);
-      console.log(root);
+      let propRoot: Head = {
+        value: "",
+        label: "",
+        path: [],
+        children: [],
+      };
+      buildDescendantBlockTree(props.splitFlag, childBlocks, blockRoot);
+      blockTree2TableData(blockRoot, propRoot, data);
+      //console.log(propRoot);
+      tableDataRef.value.push(data);
+      tableHeadRef.value.children = tableHeadRef.value.children.concat(
+        propRoot.children
+      );
     }
   }
+  //console.log("tableDataRef", tableDataRef);
+  //console.log("tableHeadRef", tableHeadRef);
   loading.value = false;
 };
 defineExpose({

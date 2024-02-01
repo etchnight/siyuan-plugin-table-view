@@ -2,7 +2,7 @@
   "name": "siyuan-plugin-table-view",
   "author": "dualwind",
   "url": "https://github.com/etchnight/siyuan-plugin-table-view",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "minAppVersion": "2.11.4",
   "backends": ["windows", "linux", "darwin", "ios", "android"],
   "frontends": ["desktop", "browser-desktop", "desktop-window"],
@@ -19,7 +19,7 @@
     "zh_CN": "README.md"
   },
   "funding": {
-    "custom": []
+    "custom": ["https://afdian.net/a/dualwind"]
   },
-  "keywords": ["plugin", "sample", "插件样例"]
+  "keywords": ["plugin", "table", "表格", "Query View"]
 }
