@@ -65,4 +65,12 @@ onMounted(() => {
     selected.value = true;
   }
 });
+const reSelect = () => {
+  selected.value = false;
+  state.value = null;
+  emit("update", null);
+};
+defineExpose({
+  reSelect,
+});
 </script>

@@ -26,6 +26,7 @@ const props = defineProps<{
   tag_property: TagSelectedItem[];
   isContainsTagChild: boolean;
   splitFlag: string;
+  filterTag: TagSelectedItem;
 }>();
 
 //let tableDate = [];
@@ -38,7 +39,7 @@ const tableHeadRef = ref<Head>({
   path: [],
 });
 
-const recurList2Tree = (parent: Head, list: { value: string }[]) => {
+const buildPropNameTree = (parent: Head, list: { value: string }[]) => {
   for (let item of list) {
     let itemPath = item.value.split("/");
     if (!isChild(itemPath, parent.path)) {
@@ -59,7 +60,7 @@ const recurList2Tree = (parent: Head, list: { value: string }[]) => {
     });
   }
   for (let child of parent.children) {
-    recurList2Tree(child, list);
+    buildPropNameTree(child, list);
   }
   function isChild(itemPath: string[], parentPath: string[]) {
     let isChild = true;
@@ -89,7 +90,7 @@ const buildHead = (props: TagSelectedItem[], splitFlag?: string) => {
       label: item.tag.value,
       path: item.tag.value.split(splitFlag),
     };
-    recurList2Tree(head, item.children);
+    buildPropNameTree(head, item.children);
     tableHeadRef.value.children.push(head);
   }
 };
@@ -119,20 +120,20 @@ function flatten(arr: any[]): any[] {
   }, []);
 }
 
-type descendantBlockGroup = {
-  childBlocks: (Block & {
+type DescendantBlockGroup = {
+  children: (Block & {
     layer: number;
   })[];
   nameBlock: Block;
 };
 const getDescendantBlocks = async (
   blocks: Block[]
-): Promise<descendantBlockGroup[]> => {
+): Promise<DescendantBlockGroup[]> => {
   return await Promise.all(
     blocks.map(async (block: Block) => {
       const childBlocks = await queryDescendantBlocks(block);
       return {
-        childBlocks: childBlocks,
+        children: childBlocks,
         nameBlock: block,
       };
     })
@@ -146,14 +147,14 @@ const getDescendantBlocks = async (
  * @param block
  * @param prop
  */
-const getPropBlock = (block: descendantBlockGroup, prop: string) => {
+const getPropBlock = (block: DescendantBlockGroup, prop: string) => {
   /*
    */
-  let propBlock = block.childBlocks.find((e) => {
+  let propBlock = block.children.find((e) => {
     return e.fcontent.indexOf(prop) > -1 && e.type !== "l";
   });
   if (!propBlock) {
-    propBlock = block.childBlocks.find((e) => {
+    propBlock = block.children.find((e) => {
       return e.content.indexOf(prop) > -1 && e.type == "p";
     });
   }
@@ -164,20 +165,21 @@ type DescendantBlockTree = {
   children: DescendantBlockTree[];
 };
 /**
- * @returns 改变parent: DescendantBlockTree
+ * @param parent 通过迭代修改
  */
 const buildDescendantBlockTree = (
-  splitFlag: string,
   blocks: (Block & {
     layer: number;
   })[],
-  parent: DescendantBlockTree
+  parent: DescendantBlockTree,
+  splitFlag?: string
 ) => {
   //childBlocks
   let childBlocks = blocks.filter((e) => {
     return (
       (e.fcontent.indexOf(splitFlag) > 0 ||
-        (e.content.indexOf(splitFlag) > 0 && e.type === "p")) &&
+        (e.content.indexOf(splitFlag) > 0 && e.type === "p") ||
+        !splitFlag) && //无分隔符号直接满足
       e.parent_id === parent.nameBlock.id &&
       e.content !== parent.nameBlock.fcontent //排除第一个子块（其父级是属性块）,一个内容只算一次
     );
@@ -189,14 +191,14 @@ const buildDescendantBlockTree = (
     };
   });
   for (let block of parent.children) {
-    buildDescendantBlockTree(splitFlag, blocks, block);
+    buildDescendantBlockTree(blocks, block, splitFlag);
   }
 };
 /**
  * @description 剔除列表块，将其子项全部挂到列表块的父级
  * @param blocks
  */
-const rebuildChildrenBlocks = (
+const rebuildChildrenBlockList = (
   blocks: (Block & {
     layer: number;
   })[]
@@ -229,9 +231,9 @@ const rebuildChildrenBlocks = (
  *  - 应将最终结果的children与tableHeadRef合并
  *  - 根对象是虚拟的，对应的是概念块（而非属性块）
  * @param props.splitFlag 隐含变量
- * @param data blockTree.nameBlock所在行
+ * @param data blockTree.nameBlock所在行，通过迭代更改
  */
-const blockTree2TableData = (
+const desBlockTree2TDataAndHead = (
   blockTree: DescendantBlockTree,
   parentHead: Head,
   data: Data
@@ -254,11 +256,50 @@ const blockTree2TableData = (
       parentHead.children.push(child);
     }
     data[propValue] = block.nameBlock.id;
-    //console.log(data)
-    blockTree2TableData(block, child, data);
+    desBlockTree2TDataAndHead(block, child, data);
   }
 };
 
+type Tree = {
+  [key: string]: any;
+  children: Tree[];
+};
+function findInTree(tree: Tree, callback: (e: Tree) => boolean) {
+  if (callback(tree)) {
+    return tree;
+  }
+  let result: Tree;
+  for (let child of tree.children) {
+    result = findInTree(child, callback);
+    if (result) {
+      break;
+    }
+  }
+  return result;
+}
+/**
+ * @param blockData 通过迭代修改
+ */
+const dataFilter = (
+  desBlockTree: DescendantBlockTree,
+  blockData: Data,
+  filterTag: TagSelectedItem
+) => {
+  for (let prop in blockData) {
+    if (prop === "name") {
+      continue;
+    }
+    const blockInTree = findInTree(desBlockTree, (e: DescendantBlockTree) => {
+      return e.nameBlock.id === blockData[prop];
+    }) as DescendantBlockTree;
+    const newBlock = blockInTree.children.find((e) => {
+      return e.nameBlock.content.indexOf(filterTag.tag.value) > -1;
+    });
+    if (newBlock) {
+      blockData[prop] = newBlock.nameBlock.id;
+    }
+  }
+};
 /**
  * @description 主程序入口
  */
@@ -313,25 +354,42 @@ const submit = async () => {
         data[prop.value] = propBlock.id;
       }
     }
-    //tableDataRef.value.push(data);
 
+    //tableDataRef.value.push(data);
+    let childBlocks: (Block & {
+      layer: number;
+    })[];
+    if (props.splitFlag || props.filterTag) {
+      childBlocks = rebuildChildrenBlockList(nameBlockObj.children);
+    }
     //*分隔符号属性
     if (props.splitFlag) {
-      const childBlocks = rebuildChildrenBlocks(nameBlockObj.childBlocks);
       let blockRoot: DescendantBlockTree = {
         nameBlock: nameBlockObj.nameBlock,
         children: [],
       };
-      buildDescendantBlockTree(props.splitFlag, childBlocks, blockRoot);
-      blockTree2TableData(blockRoot, propRoot, data);
-      tableDataRef.value.push(data);
+      buildDescendantBlockTree(childBlocks, blockRoot, props.splitFlag);
+      desBlockTree2TDataAndHead(blockRoot, propRoot, data);
+      //tableDataRef.value.push(data);
     }
+
+    //*数据后筛选
+    if (props.filterTag) {
+      let blockRoot: DescendantBlockTree = {
+        nameBlock: nameBlockObj.nameBlock,
+        children: [],
+      };
+      buildDescendantBlockTree(childBlocks, blockRoot);
+      dataFilter(blockRoot, data, props.filterTag);
+    }
+
+    tableDataRef.value.push(data);
   }
   tableHeadRef.value.children = tableHeadRef.value.children.concat(
     propRoot.children
   );
-  //console.log("tableDataRef", tableDataRef);
-  //console.log("tableHeadRef", tableHeadRef);
+  console.log("tableDataRef", tableDataRef);
+  console.log("tableHeadRef", tableHeadRef);
   loading.value = false;
 };
 defineExpose({

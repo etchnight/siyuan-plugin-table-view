@@ -21,11 +21,14 @@ const props = defineProps<{
   columnProps: Head[];
   loading: boolean;
 }>();
-
+/**
+ * @param children 预留，树形数据（子行）
+ * @param prop-任意字段 prop表示标签名，值为id
+ */
 export interface Data {
   name: string;
-  children?: Data[];
-  [prop: string]: string | Data[]; //prop表示标签名，值为id
+  children?: Data[];//
+  [prop: string]: string | Data[]; 
 }
 export interface Head {
   value: string; //用来跟body部分进行匹配

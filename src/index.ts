@@ -87,7 +87,7 @@ export default class PluginTableView extends Plugin {
 
   async onunload() {
     console.log(this.i18n.byePlugin);
-    showMessage("Goodbye SiYuan Plugin");
-    console.log("onunload");
+    //showMessage("Goodbye SiYuan Plugin");
+    //console.log("onunload");
   }
 }
