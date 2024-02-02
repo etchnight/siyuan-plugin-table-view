@@ -370,7 +370,6 @@ const submit = async () => {
       };
       buildDescendantBlockTree(childBlocks, blockRoot, props.splitFlag);
       desBlockTree2TDataAndHead(blockRoot, propRoot, data);
-      //tableDataRef.value.push(data);
     }
 
     //*数据后筛选
@@ -388,8 +387,8 @@ const submit = async () => {
   tableHeadRef.value.children = tableHeadRef.value.children.concat(
     propRoot.children
   );
-  console.log("tableDataRef", tableDataRef);
-  console.log("tableHeadRef", tableHeadRef);
+  //console.log("tableDataRef", tableDataRef);
+  //console.log("tableHeadRef", tableHeadRef);
   loading.value = false;
 };
 defineExpose({
