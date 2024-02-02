@@ -10,7 +10,8 @@
   "scripts": {
     "make-link": "node  --no-warnings ./scripts/make_dev_link.js",
     "dev": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build",
+    "commit":"git add . && git cz"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
@@ -37,7 +38,13 @@
     "@vitejs/plugin-vue": "^5.0.2",
     "@vue/tsconfig": "^0.5.1",
     "axios": "^1.6.3",
+    "cz-conventional-changelog": "^3.3.0",
     "element-plus": "^2.4.4",
     "vue": "^3.4.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }
