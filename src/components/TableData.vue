@@ -38,7 +38,11 @@ const tableHeadRef = ref<Head>({
   children: [],
   path: [],
 });
-
+/**
+ * - 查找标签时，仅在该列表类型的content中搜索
+ * - fcontent搜索不受影响
+ */
+const blockType_FindIn = ["p", "h"];
 const buildPropNameTree = (parent: Head, list: { value: string }[]) => {
   for (let item of list) {
     let itemPath = item.value.split("/");
@@ -155,7 +159,7 @@ const getPropBlock = (block: DescendantBlockGroup, prop: string) => {
   });
   if (!propBlock) {
     propBlock = block.children.find((e) => {
-      return e.content.indexOf(prop) > -1 && e.type == "p";
+      return e.content.indexOf(prop) > -1 && blockType_FindIn.includes(e.type);
     });
   }
   return propBlock;
@@ -178,7 +182,8 @@ const buildDescendantBlockTree = (
   let childBlocks = blocks.filter((e) => {
     return (
       (e.fcontent.indexOf(splitFlag) > 0 ||
-        (e.content.indexOf(splitFlag) > 0 && e.type === "p") ||
+        (e.content.indexOf(splitFlag) > 0 &&
+          blockType_FindIn.includes(e.type)) ||
         !splitFlag) && //无分隔符号直接满足
       e.parent_id === parent.nameBlock.id &&
       e.content !== parent.nameBlock.fcontent //排除第一个子块（其父级是属性块）,一个内容只算一次
