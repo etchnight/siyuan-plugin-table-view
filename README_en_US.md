@@ -16,6 +16,7 @@ Siyuan Note Plugin, Query View like Plugin, imitates the Table View function of 
     - Specify the block where the tag is located, such as a block containing `#Book#`
     - Directly search and selected block
 - attribute
+
   - e.g. `Author`, `Publisher`, etc
   - Display in the row of the concept
   - ⚠️ The block in which the attribute is located should be the descendant block of the block in which the `concept` is located
@@ -27,9 +28,16 @@ Siyuan Note Plugin, Query View like Plugin, imitates the Table View function of 
     - The block where the subtag of the concept tag is located, e.g. the block containing `#Book/Author#`
     - Blocks containing the specified delimiter, such as those that start with `Author::`
 
+- Additional conditions
+  - only show blocks with a certain label in a cell (v0.2.3)
+    - Sometimes, the property content is too long and can be filtered by this tag, such as 'Summary'
+    - ⚠️ Only the first found block is displayed
+    - ⚠️ Search only in sub-blocks, not in descendant blocks
+
 ## How to use
 
 1. Choose how you want to find the block where the `concept` is located
 2. `Next`, choose how you want to find the block where `Properties` is located
    ⚠️ The block in which the attribute is located is only found in the descendant block of the block where the `concept` is located
-3. `Generate`, the results of the query will be displayed below
+3. 'Next' and set the additional conditions
+4. `Generate`, the results of the query will be displayed below
