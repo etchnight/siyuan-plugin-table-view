@@ -10,53 +10,26 @@
     <el-step title="附加项" />
   </el-steps>
   <!--step 0 查找概念-->
-  <el-form v-if="step === 0" label-width="150px">
+  <el-form v-show="step === 0" label-width="150px">
     <el-form-item label="含有右侧标签的块">
-      <SelectTagFormItem v-model="tag_concept" #default="{ item, index }">
-        <selectTag
-          :item="(item as TagSelectedItem)"
-          :index="index"
-          @update="
-            (item) => {
-              tag_concept[index] = item;
-            }
-          "
-        ></selectTag>
+      <SelectTagFormItem v-model="tag_concept" #default="{ index }">
+        <selectTag @update="(item) => (tag_concept[index] = item)"></selectTag>
       </SelectTagFormItem>
     </el-form-item>
     <el-form-item label="右侧指定块">
-      <SelectTagFormItem
-        v-model="(blocks as BlockAC[])"
-        #default="{ item, index }"
-      >
-        <SelectBlock
-          :item="item"
-          :index="index"
-          @update="
-            (item) => {
-              blocks[index] = item;
-            }
-          "
-        ></SelectBlock>
+      <SelectTagFormItem v-model="(blocks as BlockAC[])" #default="{ index }">
+        <SelectBlock @update="(item) => (blocks[index] = item)"></SelectBlock>
       </SelectTagFormItem>
     </el-form-item>
   </el-form>
   <!--step 1 查找属性-->
-  <el-form v-if="step === 1" label-width="200px">
+  <el-form v-show="step === 1" label-width="200px">
     <el-form-item label="上一步选定标签的子标签">
       <el-switch v-model="isContainsTagChild" />
     </el-form-item>
     <el-form-item label="含有右侧标签及其子标签的块">
-      <SelectTagFormItem v-model="tag_property" #default="{ item, index }">
-        <selectTag
-          :item="(item as TagSelectedItem)"
-          :index="index"
-          @update="
-            (item) => {
-              tag_property[index] = item;
-            }
-          "
-        ></selectTag>
+      <SelectTagFormItem v-model="tag_property" #default="{ index }">
+        <selectTag @update="(item) => (tag_property[index] = item)"></selectTag>
       </SelectTagFormItem>
     </el-form-item>
     <el-form-item label="使用右侧分隔符号">
@@ -65,18 +38,11 @@
       </el-col>
     </el-form-item>
   </el-form>
-  <el-form v-if="step > 1">
+  <el-form v-show="step > 1">
     <el-form-item label="仅在单元格中显示带有右侧标签的块">
-      <selectTag
-        ref="filterTag_Comp"
-        :item="filterTag"
-        @update="
-          (item) => {
-            filterTag = item;
-          }
-        "
-      >
+      <selectTag ref="filterTag_Comp" @update="(item) => (filterTag = item)">
       </selectTag>
+      <!--button必须在selectTag加载后再加载，否则无法找到reSelect函数-->
       <el-button
         v-if="filterTag_Comp"
         :icon="RefreshRight"

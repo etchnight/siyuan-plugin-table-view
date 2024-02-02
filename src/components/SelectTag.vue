@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { searchTag } from "../../lib/siyuanPlugin-common/siyuan-api/search";
 //import { Loading } from "@element-plus/icons-vue";
 export interface TagSelectedItem {
@@ -24,7 +24,6 @@ const selected = ref(false);
 const emit = defineEmits<{
   (e: "update", item: TagSelectedItem);
 }>();
-const props = defineProps<{ item: TagSelectedItem }>();
 //const tagsRef = ref([]);
 let tags: AutocompleteItem[] = [];
 /**
@@ -59,12 +58,7 @@ const handleSelect = (item: AutocompleteItem) => {
   });
   selected.value = true;
 };
-onMounted(() => {
-  if (props.item?.tag?.value) {
-    state.value = props.item.tag.value;
-    selected.value = true;
-  }
-});
+
 const reSelect = () => {
   selected.value = false;
   state.value = null;
