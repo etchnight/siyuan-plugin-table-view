@@ -224,7 +224,7 @@ const rebuildChildrenBlocks = (
 };
 
 /**
- * @param parent Head类型
+ * @param parentHead Head类型
  *  - 通过迭代更改
  *  - 应将最终结果的children与tableHeadRef合并
  *  - 根对象是虚拟的，对应的是概念块（而非属性块）
@@ -233,21 +233,28 @@ const rebuildChildrenBlocks = (
  */
 const blockTree2TableData = (
   blockTree: DescendantBlockTree,
-  parent: Head,
+  parentHead: Head,
   data: Data
 ) => {
   for (let block of blockTree.children) {
     const reg = new RegExp(`(${props.splitFlag}).*`);
     let prop = block.nameBlock.content.replace(reg, "");
-    let propValue = parent.value + prop + props.splitFlag;
+    let propValue = parentHead.value + prop + props.splitFlag;
     let child: Head = {
       value: propValue,
       label: prop,
-      path: parent.path.concat(prop),
+      path: parentHead.path.concat(prop),
       children: [],
     };
-    parent.children.push(child);
+    if (
+      !parentHead.children.find((e) => {
+        return e.value === propValue;
+      })
+    ) {
+      parentHead.children.push(child);
+    }
     data[propValue] = block.nameBlock.id;
+    //console.log(data)
     blockTree2TableData(block, child, data);
   }
 };
@@ -284,8 +291,18 @@ const submit = async () => {
     propList = propList.concat(tag.children);
   }
   /*构建主体，行列对应
-  第一列为名称，值为tag所在block的content
+  - 第一列为名称，值为概念标识所在block的content
   其余列根据tag表示的属性，分别从后代block中查找*/
+  /**
+   * 分隔符号属性树全局只有一个；
+   * 分隔符号概念数量与概念块数量相同
+   */
+  let propRoot: Head = {
+    value: "",
+    label: "",
+    path: [],
+    children: [],
+  };
   for (const nameBlockObj of nameAndChildBlocks) {
     let data: Data = {
       name: nameBlockObj.nameBlock.content,
@@ -305,21 +322,14 @@ const submit = async () => {
         nameBlock: nameBlockObj.nameBlock,
         children: [],
       };
-      let propRoot: Head = {
-        value: "",
-        label: "",
-        path: [],
-        children: [],
-      };
       buildDescendantBlockTree(props.splitFlag, childBlocks, blockRoot);
       blockTree2TableData(blockRoot, propRoot, data);
-      //console.log(propRoot);
       tableDataRef.value.push(data);
-      tableHeadRef.value.children = tableHeadRef.value.children.concat(
-        propRoot.children
-      );
     }
   }
+  tableHeadRef.value.children = tableHeadRef.value.children.concat(
+    propRoot.children
+  );
   //console.log("tableDataRef", tableDataRef);
   //console.log("tableHeadRef", tableHeadRef);
   loading.value = false;
