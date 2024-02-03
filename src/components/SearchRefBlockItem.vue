@@ -12,7 +12,7 @@
         style="position: absolute; margin-top: 8px; top: 0px"
       >
         <use
-          :xlink:href="'#' + getIconByType(props.item.type, props.item.subtype)"
+          :xlink:href="'#' + getIconByType(props.item.type, props.item.subType)"
         ></use>
       </svg>
       <span
