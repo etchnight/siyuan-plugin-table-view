@@ -69,6 +69,15 @@ const querySearchAsync = async (
     ESearchOrderBy.类型,
     ESearchGroupBy.不分组
   );
+  const sortSubTypeList = ["h1", "h2", "h3", "h4", "h5", "h6"];
+  const sortFun = (e: string) => {
+    return sortSubTypeList.indexOf(e) < 0
+      ? sortSubTypeList.length + 1
+      : sortSubTypeList.indexOf(e);
+  };
+  res.blocks.sort((a, b) => {
+    return sortFun(a.subType) - sortFun(b.subType);
+  });
   for (let block of res.blocks) {
     blocks.push({
       ...block,
