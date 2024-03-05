@@ -55,9 +55,9 @@
 </template>
 <script setup lang="ts">
 import { getIconByType } from "../../lib/siyuanPlugin-common/common";
-import { FullTextSearchBlockResult } from "../../lib/siyuanPlugin-common/siyuan-api/search";
+import { BlockTree } from "../../lib/siyuanPlugin-common/types/siyuan-api";
 
 const props = defineProps<{
-  item: FullTextSearchBlockResult;
+  item: BlockTree;
 }>();
 </script>

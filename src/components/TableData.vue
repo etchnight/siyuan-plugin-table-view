@@ -13,6 +13,7 @@ import {
   queryBlocksByTag,
   queryDescendantBlocks,
 } from "../../lib/siyuanPlugin-common/siyuan-api/query";
+import { TreeTools } from "../../lib/js-utility-function/src/tree";
 //import { getParentNextChildID } from "../../lib/siyuanPlugin-common/siyuan-api/block";
 import { Block } from "../../lib/siyuanPlugin-common/types/siyuan-api";
 import { Data, Head } from "./Table.vue";
@@ -37,6 +38,11 @@ const tableHeadRef = ref<Head>({
   label: "",
   children: [],
   path: [],
+});
+const treeTools = new TreeTools({
+  id: "id",
+  pid: "parentID",
+  children: "childrem",
 });
 /**
  * - 查找标签时，仅在该列表类型的content中搜索
@@ -168,8 +174,10 @@ type DescendantBlockTree = {
   nameBlock: Block;
   children: DescendantBlockTree[];
 };
+
 /**
  * @param parent 通过迭代修改
+ * 经过精简，仅含有带有属性的块
  */
 const buildDescendantBlockTree = (
   blocks: (Block & {
@@ -374,6 +382,7 @@ const submit = async () => {
         children: [],
       };
       buildDescendantBlockTree(childBlocks, blockRoot, props.splitFlag);
+      console.log(blockRoot);
       desBlockTree2TDataAndHead(blockRoot, propRoot, data);
     }
 
@@ -392,8 +401,8 @@ const submit = async () => {
   tableHeadRef.value.children = tableHeadRef.value.children.concat(
     propRoot.children
   );
-  //console.log("tableDataRef", tableDataRef);
-  //console.log("tableHeadRef", tableHeadRef);
+  console.log("tableDataRef", tableDataRef);
+  console.log("tableHeadRef", tableHeadRef);
   loading.value = false;
 };
 defineExpose({

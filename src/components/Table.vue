@@ -1,9 +1,5 @@
 <template>
-  <el-table
-    v-loading="loading"
-    :data="tableData"
-    border="true"
-  >
+  <el-table v-loading="loading" :data="tableData" border="true">
     <el-table-column
       prop="name"
       label="名称"
@@ -23,12 +19,12 @@ const props = defineProps<{
 }>();
 /**
  * @param children 预留，树形数据（子行）
- * @param prop-任意字段 prop表示标签名，值为id
+ * @param prop-任意字段 prop(key)表示标签名，value 为 id
  */
 export interface Data {
   name: string;
-  children?: Data[];//
-  [prop: string]: string | Data[]; 
+  children?: Data[]; //
+  [prop: string]: string | Data[];
 }
 export interface Head {
   value: string; //用来跟body部分进行匹配

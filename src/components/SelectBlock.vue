@@ -23,9 +23,9 @@ import {
   ISearchTypes,
   ESearchGroupBy,
   ESearchOrderBy,
-  FullTextSearchBlockResult,
 } from "../../lib/siyuanPlugin-common/siyuan-api/search";
 import { AutocompleteItem } from "./SelectTag.vue";
+import { BlockTree } from "../../lib/siyuanPlugin-common/types/siyuan-api";
 const state = ref("");
 const selected = ref(false);
 const emit = defineEmits<{
@@ -34,7 +34,7 @@ const emit = defineEmits<{
 //const tagsRef = ref([]);
 let blocks: BlockAC[] = [];
 
-export type BlockAC = FullTextSearchBlockResult &
+export type BlockAC = BlockTree &
   AutocompleteItem & {
     contentCleared: string;
   };
@@ -46,7 +46,7 @@ const querySearchAsync = async (
   queryString: string,
   cb: (arg: any) => void
 ) => {
-  blocks = [];
+  blocks = []; //清空返回结果
   let types: ISearchTypes = {
     blockquote: false,
     codeBlock: false,
@@ -61,6 +61,16 @@ const querySearchAsync = async (
     superBlock: false,
     table: false,
   };
+  //处理直接粘贴的标题
+  let headReg = /#{1,6} /;
+  if (queryString.search(headReg) === 0) {
+    queryString = queryString.replace(headReg, "");
+    for (let key of Object.keys(types)) {
+      types[key] = false;
+    }
+    types.heading = true;
+  }
+
   const res = await fullTextSearchBlock(
     queryString,
     ESearchMethod.keyword,
