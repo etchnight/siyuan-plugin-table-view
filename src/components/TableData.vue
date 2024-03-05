@@ -38,6 +38,7 @@ const tableHeadRef = ref<Head>({
   label: "",
   children: [],
   path: [],
+  splitFlag: "",
 });
 const treeTools = new TreeTools({
   id: "id",
@@ -67,6 +68,7 @@ const buildPropNameTree = (parent: Head, list: { value: string }[]) => {
       label: itemPath[itemPath.length - 1],
       children: [],
       path: itemPath,
+      splitFlag: "/",
     });
   }
   for (let child of parent.children) {
@@ -99,6 +101,7 @@ const buildHead = (props: TagSelectedItem[], splitFlag?: string) => {
       value: item.tag.value,
       label: item.tag.value,
       path: item.tag.value.split(splitFlag),
+      splitFlag: splitFlag,
     };
     buildPropNameTree(head, item.children);
     tableHeadRef.value.children.push(head);
@@ -254,12 +257,14 @@ const desBlockTree2TDataAndHead = (
   for (let block of blockTree.children) {
     const reg = new RegExp(`(${props.splitFlag}).*`);
     let prop = block.nameBlock.content.replace(reg, "");
+    prop = prop.startsWith(" ") ? prop.replace(" ", "") : prop;
     let propValue = parentHead.value + prop + props.splitFlag;
     let child: Head = {
       value: propValue,
       label: prop,
       path: parentHead.path.concat(prop),
       children: [],
+      splitFlag: props.splitFlag,
     };
     if (
       !parentHead.children.find((e) => {
@@ -324,6 +329,7 @@ const submit = async () => {
     label: "",
     children: [],
     path: [],
+    splitFlag: "",
   };
   tableDataRef.value = [];
 
@@ -356,6 +362,7 @@ const submit = async () => {
     label: "",
     path: [],
     children: [],
+    splitFlag: "",
   };
   for (const nameBlockObj of nameAndChildBlocks) {
     let data: Data = {
@@ -382,7 +389,6 @@ const submit = async () => {
         children: [],
       };
       buildDescendantBlockTree(childBlocks, blockRoot, props.splitFlag);
-      console.log(blockRoot);
       desBlockTree2TDataAndHead(blockRoot, propRoot, data);
     }
 

@@ -26,10 +26,18 @@ export interface Data {
   children?: Data[]; //
   [prop: string]: string | Data[];
 }
+/**
+ * - value 用来跟body部分进行匹配
+ * - label 显示的名称
+ * - children
+ * - path
+ * - splitFlag 分隔符号，后序处理用
+ */
 export interface Head {
   value: string; //用来跟body部分进行匹配
   label: string; //显示的名称
   children: Head[];
   path: string[];
+  splitFlag: string; 
 }
 </script>
