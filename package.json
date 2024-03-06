@@ -1,6 +1,6 @@
 {
   "name": "siyuan-plugin-table-view",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "type": "module",
   "description": "抽取笔记内容生成表格，汇总概念及其属性",
   "repository": "",

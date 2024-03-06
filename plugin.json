@@ -2,7 +2,7 @@
   "name": "siyuan-plugin-table-view",
   "author": "dualwind",
   "url": "https://github.com/etchnight/siyuan-plugin-table-view",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "minAppVersion": "2.11.4",
   "backends": ["windows", "linux", "darwin", "ios", "android"],
   "frontends": ["desktop", "browser-desktop", "desktop-window"],

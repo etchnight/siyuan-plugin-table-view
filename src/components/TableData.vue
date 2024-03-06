@@ -411,8 +411,8 @@ const submit = async () => {
   tableHeadRef.value.children = tableHeadRef.value.children.concat(
     propRoot.children
   );
-  console.log("tableDataRef", tableDataRef);
-  console.log("tableHeadRef", tableHeadRef);
+  //console.log("tableDataRef", tableDataRef);
+  //console.log("tableHeadRef", tableHeadRef);
   loading.value = false;
 };
 defineExpose({
