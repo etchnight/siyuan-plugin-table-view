@@ -4,7 +4,7 @@
     :label="props.child.label"
     resizable="true"
     header-align="center"
-    v-if="props.child.children.length == 0"
+    v-if="props.child.children.length === 0"
   >
     <!--单元格内容-->
     <template #default="scope">
@@ -44,5 +44,4 @@ import { Head } from "./Table.vue";
 const props = defineProps<{
   child: Head;
 }>();
-
 </script>

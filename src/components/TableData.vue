@@ -365,8 +365,12 @@ const submit = async () => {
     splitFlag: "",
   };
   for (const nameBlockObj of nameAndChildBlocks) {
+    let name = nameBlockObj.nameBlock.content;
+    for (let tag of props.tag_concept) {
+      name = name.replace(`#${tag.tag.value}#`, "");
+    }
     let data: Data = {
-      name: nameBlockObj.nameBlock.content,
+      name: name,
     };
     for (let prop of propList) {
       let propBlock = getPropBlock(nameBlockObj, prop.value);
